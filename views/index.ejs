@@ -10,425 +10,846 @@
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="container nav-wrapper">
-      <a href="/" class="logo-link">
-        <div class="logo-icon">S</div>
-        <%= site_name %>
-      </a>
+  <!-- Full-Screen Onboarding Slides Overlay -->
+  <div class="onboarding-overlay" id="onboarding-overlay" style="display: none;">
+    <div class="onboarding-viewport">
+      <button class="onboarding-skip-btn" onclick="finishOnboarding()"><%= dict.onboarding_skip %> <i class="fa-solid fa-angles-right"></i></button>
       
-      <nav id="nav-menu">
-        <a href="#home" class="active"><%= dict.nav_home %></a>
-        <a href="#prices"><%= dict.nav_prices %></a>
-        <a href="#tools"><%= dict.nav_tools %></a>
-        <a href="#simulator"><%= dict.nav_simulator %></a>
-        <a href="/admin?auth=seedorra-admin" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;"><i class="fa-solid fa-lock" style="margin-right: 6px;"></i><%= dict.nav_admin %></a>
-      </nav>
-
-      <div class="lang-selector">
-        <select class="lang-select" onchange="changeLanguage(this.value)">
-          <option value="en" <%= lang === 'en' ? 'selected' : '' %>>🇬🇧 English</option>
-          <option value="yo" <%= lang === 'yo' ? 'selected' : '' %>>🇳🇬 Yoruba</option>
-          <option value="ha" <%= lang === 'ha' ? 'selected' : '' %>>🇳🇬 Hausa</option>
-          <option value="ig" <%= lang === 'ig' ? 'selected' : '' %>>🇳🇬 Igbo</option>
-          <option value="pcm" <%= lang === 'pcm' ? 'selected' : '' %>>🇳🇬 Pidgin</option>
-        </select>
-      </div>
-
-      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero" id="home">
-    <div class="container hero-grid">
-      <div class="hero-content">
-        <h1 class="hero-title"><span><%= dict.hero_title %></span></h1>
-        <p class="hero-subtitle"><%= dict.hero_subtitle %></p>
-        <div class="hero-actions">
-          <a href="#tools" class="btn btn-primary"><%= dict.btn_get_started %></a>
-          <a href="#prices" class="btn btn-secondary"><%= dict.btn_explore_prices %></a>
-          <a href="#simulator" class="btn btn-accent"><%= dict.btn_try_ussd %></a>
+      <div class="onboarding-slides" id="onboarding-slides">
+        <!-- Slide 1: Welcome/Splash -->
+        <div class="onboarding-slide" style="background-color: #EAE6F8; justify-content: center; align-items: center; text-align: center; padding: 40px;">
+          <div style="background-color: #fff; width: 100px; height: 100px; border-radius: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(140,98,255,0.15); margin-bottom: 24px;">
+            <span style="font-family: var(--font-heading); font-weight: 800; font-size: 48px; color: var(--primary-color);">S</span>
+          </div>
+          <h1 style="font-size: 38px; margin-bottom: 12px; font-family: var(--font-heading); font-weight: 800;"><%= site_name %></h1>
+          <p style="font-size: 15px; color: var(--text-muted); max-width: 280px; margin-bottom: 40px;"><%= dict.onboarding_welcome_desc %></p>
+          <button class="btn btn-accent" style="width: 100%; max-width: 280px;" onclick="nextSlide(1)"><%= dict.onboarding_btn_start %></button>
         </div>
-      </div>
-      <div class="hero-image-wrapper">
-        <!-- Responsive layout styling maps to local media path or uses an aesthetic vector mockup -->
-        <div style="background: linear-gradient(135deg, rgba(86, 178, 89, 0.2), rgba(140, 98, 255, 0.15)); width: 100%; height: 380px; border-radius: var(--border-radius-lg); display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-lg);">
-          <div style="text-align: center; padding: 40px; z-index: 2;">
-            <i class="fa-solid fa-seedling" style="font-size: 72px; color: var(--primary-color); margin-bottom: 20px;"></i>
-            <h3 style="font-size: 24px; margin-bottom: 8px;"><%= site_name %> AI Advisor</h3>
-            <p style="font-size: 14px; color: var(--text-muted); max-width: 280px; margin: 0 auto;">Optimized crop management for smallholder farmers across Nigeria.</p>
+
+        <!-- Slide 2: Weather Alerts -->
+        <div class="onboarding-slide">
+          <div class="slide-image-section" style="background-image: url('<%= media.onboarding_weather %>');">
+            <div class="slide-image-overlay"></div>
           </div>
-          <div style="position: absolute; bottom: -20px; right: -20px; width: 150px; height: 150px; border-radius: 50%; background-color: rgba(140, 98, 255, 0.1);"></div>
-          <div style="position: absolute; top: -30px; left: -30px; width: 120px; height: 120px; border-radius: 50%; background-color: rgba(86, 178, 89, 0.1);"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Weather & Alerts Section -->
-  <section class="section" id="weather">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title"><%= dict.section_weather_title %></h2>
-        <p class="section-desc"><%= dict.section_weather_desc %></p>
-      </div>
-
-      <div class="tools-grid">
-        <!-- Weather Card Selector -->
-        <div class="weather-card">
-          <div class="weather-header-row">
-            <h3 style="font-size: 20px;"><i class="fa-solid fa-cloud-sun" style="color: var(--secondary-color); margin-right: 10px;"></i><%= dict.label_select_region %></h3>
-            <select class="form-control" style="width: auto; padding: 8px 16px;" id="weather-region-select" onchange="updateWeather(this.value)">
-              <option value="SW">South-West (Lagos/Ibadan)</option>
-              <option value="SE">South-East (Enugu/Onitsha)</option>
-              <option value="NW">North-West (Kano/Kaduna)</option>
-              <option value="NE">North-East (Maiduguri/Bauchi)</option>
-              <option value="SS">South-South (Port Harcourt)</option>
-            </select>
-          </div>
-
-          <div class="weather-info">
-            <i class="fa-solid fa-cloud-showers-heavy" id="weather-icon" style="font-size: 48px; color: var(--primary-color);"></i>
-            <div>
-              <div class="weather-temp" id="weather-temp">30°C</div>
-              <div style="font-size: 14px; color: var(--text-muted);" id="weather-forecast">Heavy Thunderstorms expected tomorrow.</div>
+          <div class="onboarding-card">
+            <div class="onboarding-dots">
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot active"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
             </div>
-          </div>
-
-          <div class="weather-details">
-            <div class="weather-detail-item">
-              <div class="weather-detail-label"><%= dict.label_temp %></div>
-              <div class="weather-detail-val" id="detail-temp">30°C</div>
-            </div>
-            <div class="weather-detail-item">
-              <div class="weather-detail-label"><%= dict.label_humidity %></div>
-              <div class="weather-detail-val" id="detail-humidity">82%</div>
-            </div>
-            <div class="weather-detail-item" style="grid-column: span 2;">
-              <div class="weather-detail-label"><%= dict.label_wind %></div>
-              <div class="weather-detail-val" id="detail-wind">14 km/h</div>
+            <h2 class="onboarding-title"><%= dict.onboarding_weather_title %></h2>
+            <p class="onboarding-desc"><%= dict.onboarding_weather_desc %></p>
+            <div class="onboarding-btn-row">
+              <button class="btn btn-primary" onclick="nextSlide(2)"><%= dict.onboarding_next %> <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></button>
             </div>
           </div>
         </div>
 
-        <!-- Dynamic Warnings Alert Panel -->
-        <div class="phone-container" style="display: flex; flex-direction: column; justify-content: center;">
-          <div class="alert-box alert-severe" id="weather-alert-card">
-            <div class="alert-header">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              <span><%= dict.label_active_alert %></span>
+        <!-- Slide 3: Crop Recommendation -->
+        <div class="onboarding-slide">
+          <div class="slide-image-section" style="background-image: url('<%= media.onboarding_crops %>');">
+            <div class="slide-image-overlay"></div>
+          </div>
+          <div class="onboarding-card">
+            <div class="onboarding-dots">
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot active"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
             </div>
-            <div class="alert-message" id="weather-alert-message">
-              Rainfall warning: High flood risk in low-lying farmlands. Clear drainage channels.
+            <h2 class="onboarding-title"><%= dict.onboarding_crops_title %></h2>
+            <p class="onboarding-desc"><%= dict.onboarding_crops_desc %></p>
+            <div class="onboarding-btn-row">
+              <button class="btn btn-primary" onclick="nextSlide(3)"><%= dict.onboarding_next %> <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></button>
             </div>
           </div>
-          <div style="margin-top: 24px; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--border-color); background-color: var(--surface-color); display: flex; align-items: center; gap: 12px;">
-            <i class="fa-solid fa-circle-check" style="color: var(--secondary-color); font-size: 24px;"></i>
-            <span style="font-size: 14px; font-weight: 500;"><%= dict.label_status_good %></span>
+        </div>
+
+        <!-- Slide 4: Soil Health & Yield -->
+        <div class="onboarding-slide">
+          <div class="slide-image-section" style="background-image: url('<%= media.onboarding_soil %>');">
+            <div class="slide-image-overlay"></div>
+          </div>
+          <div class="onboarding-card">
+            <div class="onboarding-dots">
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot active"></span>
+              <span class="onboarding-dot"></span>
+            </div>
+            <h2 class="onboarding-title"><%= dict.onboarding_soil_title %></h2>
+            <p class="onboarding-desc"><%= dict.onboarding_soil_desc %></p>
+            <div class="onboarding-btn-row">
+              <button class="btn btn-primary" onclick="nextSlide(4)"><%= dict.onboarding_next %> <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 5: Let's Start -->
+        <div class="onboarding-slide">
+          <div class="slide-image-section" style="background-image: url('<%= media.onboarding_welcome %>');">
+            <div class="slide-image-overlay"></div>
+          </div>
+          <div class="onboarding-card">
+            <div class="onboarding-dots">
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot"></span>
+              <span class="onboarding-dot active"></span>
+            </div>
+            <h2 class="onboarding-title">Start Growing Smarter!</h2>
+            <p class="onboarding-desc">Register your farm layout to receive customized alerts, or sign in to your dashboard.</p>
+            <div class="onboarding-btn-row">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
+                <button class="btn btn-primary" onclick="finishOnboarding('login')"><%= dict.onboarding_btn_login %></button>
+                <button class="btn btn-accent" onclick="finishOnboarding('register')"><%= dict.onboarding_btn_register %></button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Live Market Prices Section -->
-  <section class="section section-alt" id="prices">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title"><%= dict.section_prices_title %></h2>
-        <p class="section-desc"><%= dict.section_prices_desc %></p>
+  <!-- Gateway Auth Overlay (Lock Screen for returning users) -->
+  <div class="modal-overlay active" id="gateway-auth-overlay" style="display: none; background: linear-gradient(135deg, rgba(26,87,24,0.1) 0%, rgba(0,0,0,0.85) 100%); z-index: 1800; overflow-y: auto;">
+    <div class="modal-card" style="width: 90%; max-width: 440px; margin: 40px auto; pointer-events: auto;">
+      <!-- Logo header -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); width: 56px; height: 56px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 28px; margin-bottom: 12px;">S</div>
+        <h2 style="font-size: 24px; font-family: var(--font-heading);"><%= site_name %> Gateway</h2>
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Sign in or create a profile to access agricultural advice.</p>
       </div>
 
-      <div class="prices-wrapper">
-        <table class="price-table">
-          <thead>
-            <tr>
-              <th><%= dict.price_col_commodity %></th>
-              <th><%= dict.price_col_size %></th>
-              <th><%= dict.price_col_current %></th>
-              <th><%= dict.price_col_prev %></th>
-              <th><%= dict.price_col_trend %></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% prices.forEach(item => { %>
-              <tr>
-                <td style="font-weight: 600;"><%= item.name %></td>
-                <td><%= item.size %></td>
-                <td style="font-weight: 700;">₦<%= item.current %></td>
-                <td style="color: var(--text-muted);">₦<%= item.previous %></td>
-                <td>
-                  <% if (item.trend === 'up') { %>
-                    <span class="trend-badge trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ▲ ₦<%= item.diff.toLocaleString() %></span>
-                  <% } else if (item.trend === 'down') { %>
-                    <span class="trend-badge trend-down"><i class="fa-solid fa-arrow-trend-down"></i> ▼ ₦<%= Math.abs(item.diff).toLocaleString() %></span>
-                  <% } else { %>
-                    <span class="trend-badge trend-neutral"><i class="fa-solid fa-minus"></i> Stable</span>
-                  <% } %>
-                </td>
-              </tr>
-            <% }); %>
-          </tbody>
-        </table>
+      <!-- Gateway error messages -->
+      <div id="gateway-error" class="admin-alert" style="background-color: #F8D7DA; color: #721C24; border: 1px solid #F5C6CB; margin-bottom: 20px; font-size: 13.5px; display: none;"></div>
+
+      <!-- Tabs header -->
+      <div style="display: flex; background-color: rgba(0,0,0,0.03); padding: 4px; border-radius: 20px; gap: 4px; margin-bottom: 24px;">
+        <button id="gt-tab-login" onclick="switchGatewayTab('login')" style="flex: 1; border: none; background: var(--surface-color); color: var(--primary-color); font-weight: 700; padding: 8px; border-radius: 16px; cursor: pointer; box-shadow: var(--shadow-sm);">Log In</button>
+        <button id="gt-tab-register" onclick="switchGatewayTab('register')" style="flex: 1; border: none; background: transparent; color: var(--text-muted); font-weight: 700; padding: 8px; border-radius: 16px; cursor: pointer;">Register Farm</button>
       </div>
+
+      <!-- Log In Form panel -->
+      <div id="gt-panel-login">
+        <form id="gateway-login-form" onsubmit="handleGatewayLogin(event)">
+          <div class="form-group">
+            <label id="gt-label-username">Farmer's Full Name</label>
+            <input type="text" id="gt-login-username" class="form-control" placeholder="e.g. Bamidele Alao" required>
+          </div>
+          <div class="form-group">
+            <label id="gt-label-credential">Password / Phone Number</label>
+            <div class="password-field-wrapper">
+              <input type="password" id="gt-login-credential" class="form-control" placeholder="Enter password or phone number" required>
+              <button type="button" class="password-toggle-eye" onclick="togglePasswordVisibility('gt-login-credential')">
+                <i class="fa-solid fa-eye" id="gt-login-credential-eye"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Access My Dashboard</button>
+        </form>
+        <div style="text-align: center; font-size: 13px;">
+          <span id="gt-admin-toggle-text">Are you a system administrator?</span>
+          <a href="#" style="color: var(--accent-color); font-weight: 700; text-decoration: none;" onclick="toggleGatewayAdminLogin(event)" id="gt-admin-toggle-link">Sign In as Admin</a>
+        </div>
+      </div>
+
+      <!-- Register Form panel -->
+      <div id="gt-panel-register" style="display: none;">
+        <form id="gateway-register-form" onsubmit="handleGatewayRegister(event)">
+          <div class="form-group">
+            <label><%= dict.label_farmer_name %></label>
+            <input type="text" id="gt-reg-name" class="form-control" placeholder="e.g. Baba Tunde" required>
+          </div>
+          <div class="form-group">
+            <label><%= dict.label_farmer_location %></label>
+            <input type="text" id="gt-reg-location" class="form-control" placeholder="e.g. Ibadan, Oyo" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px;">
+            <div class="form-group">
+              <label><%= dict.label_farmer_size %></label>
+              <input type="number" id="gt-reg-size" class="form-control" placeholder="Hectares" min="0.1" step="0.1" required>
+            </div>
+            <div class="form-group">
+              <label><%= dict.label_farmer_phone %></label>
+              <input type="tel" id="gt-reg-phone" class="form-control" placeholder="e.g. 08031234567" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Set Password</label>
+            <input type="password" id="gt-reg-password" class="form-control" placeholder="Create a secure password" required>
+          </div>
+          <div class="form-group">
+            <label><%= dict.label_farmer_email %></label>
+            <input type="email" id="gt-reg-email" class="form-control" placeholder="e.g. name@domain.com">
+          </div>
+          <button type="submit" class="btn btn-accent" style="width: 100%;">Create Farm Account</button>
+        </form>
+      </div>
+
+      <!-- Success State -->
+      <div id="gt-panel-success" style="display: none; text-align: center;">
+        <div class="success-check-badge">🎉</div>
+        <h3 style="font-size: 22px; margin-bottom: 8px;">Registration Successful!</h3>
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 24px;">Welcome to Seedorra! You can now log in to access your dashboard.</p>
+        <button class="btn btn-primary" style="width: 100%;" onclick="switchGatewayTab('login')">Log In Now</button>
+      </div>
+
     </div>
-  </section>
+  </div>
 
-  <!-- Advisory Tools Section -->
-  <section class="section" id="tools">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title"><%= dict.nav_tools %></h2>
-        <p class="section-desc">Generate predictions, estimations, and advisories to increase your yield output.</p>
+  <!-- Extended Farmer Dashboard Modal Portal -->
+  <div class="farmer-dashboard-overlay" id="farmer-dashboard-overlay">
+    <div class="farmer-dashboard-card">
+      
+      <!-- Dashboard Tab Header -->
+      <div class="fd-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div class="profile-avatar-uploader" style="width: 48px; height: 48px; margin: 0; border-width: 2px;" onclick="triggerPhotoUpload()">
+            <img id="fd-header-avatar" src="/images/onboarding_welcome.jpg" alt="Avatar">
+            <div class="profile-avatar-hover" style="font-size: 8px;"><i class="fa-solid fa-camera"></i></div>
+          </div>
+          <div>
+            <h3 style="font-size: 18px; line-height: 1.2;" id="fd-welcome-title">Bamidele Alao</h3>
+            <p style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-location-dot" style="margin-right: 4px; color: var(--secondary-color);"></i><span id="fd-location">Ogbomosho, Oyo</span></p>
+          </div>
+        </div>
+        
+        <ul class="fd-nav-tabs">
+          <li class="fd-tab-item active" id="tab-feed"><button onclick="switchTab('feed')"><i class="fa-solid fa-house" style="margin-right: 6px;"></i>Feed</button></li>
+          <li class="fd-tab-item" id="tab-diag"><button onclick="switchTab('diag')"><i class="fa-solid fa-kit-medical" style="margin-right: 6px;"></i>Diagnose</button></li>
+          <li class="fd-tab-item" id="tab-pest"><button onclick="switchTab('pest')"><i class="fa-solid fa-bug" style="margin-right: 6px;"></i>Pest Alerts</button></li>
+          <li class="fd-tab-item" id="tab-profile"><button onclick="switchTab('profile')"><i class="fa-solid fa-circle-user" style="margin-right: 6px;"></i>Profile & Badges</button></li>
+          <li class="fd-tab-item" id="tab-help"><button onclick="switchTab('help')"><i class="fa-solid fa-circle-info" style="margin-right: 6px;"></i>Help Desk</button></li>
+        </ul>
+
+        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="logoutFarmer()"><i class="fa-solid fa-right-from-bracket" style="margin-right: 4px;"></i>Log Out</button>
       </div>
 
-      <div class="tools-grid">
-        <!-- AI Crop Recommendation -->
-        <div class="tool-card">
-          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-color);"></i>
-            <%= dict.section_crop_title %>
-          </h3>
-          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_crop_desc %></p>
-          
-          <div class="form-group">
-            <label><%= dict.label_state %></label>
-            <select class="form-control" id="crop-state">
-              <option value="South">Oyo / Osun / Ondo (West)</option>
-              <option value="South">Enugu / Anambra / Imo (East)</option>
-              <option value="North">Kano / Kaduna / Katsina (North)</option>
-              <option value="North">Borno / Adamawa / Bauchi (North-East)</option>
-              <option value="South">Rivers / Delta / Akwa Ibom (South)</option>
-            </select>
+      <!-- Dashboard Content Viewport -->
+      <div class="fd-body">
+        
+        <!-- PANEL 1: MY FARM FEED -->
+        <div class="fd-panel active" id="panel-feed">
+          <!-- Photo News Slideshow Session -->
+          <div class="news-slider-container">
+            <div class="news-slides" id="news-slides">
+              <div class="news-slide active" style="background-image: url('/images/news_harvest.jpg');">
+                <div class="news-caption-overlay">
+                  <span style="background-color: var(--secondary-color); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; display: inline-block;">FARM HARVEST STORY</span>
+                  <h4 style="font-size: 16px; font-weight: 700;">Cooperative Farm Bumper Harvest in Oyo State</h4>
+                  <p style="font-size: 13px; opacity: 0.9;">Farmers report a 15% increase in Yam yield using Seedorra planting windows.</p>
+                </div>
+              </div>
+              <div class="news-slide" style="background-image: url('/images/news_irrigation.jpg');">
+                <div class="news-caption-overlay">
+                  <span style="background-color: var(--accent-color); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; display: inline-block;">TECHNOLOGY UPDATE</span>
+                  <h4 style="font-size: 16px; font-weight: 700;">Solar Drip Irrigation Installations Spread in North</h4>
+                  <p style="font-size: 13px; opacity: 0.9;">New low-cost solar sprinkler rigs deployed to combat local dry spells.</p>
+                </div>
+              </div>
+              <div class="news-slide" style="background-image: url('/images/onboarding_welcome.jpg');">
+                <div class="news-caption-overlay">
+                  <span style="background-color: var(--primary-color); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; display: inline-block;">COMMUNITY LAUNCH</span>
+                  <h4 style="font-size: 16px; font-weight: 700;">Seedorra Offline SMS Reaches 10,000 Smallholders</h4>
+                  <p style="font-size: 13px; opacity: 0.9;">Agronomy tips delivered in Hausa, Yoruba, and Igbo daily to basic keypad phones.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label><%= dict.label_season %></label>
-            <select class="form-control" id="crop-season">
-              <option value="wet"><%= dict.opt_wet %></option>
-              <option value="dry"><%= dict.opt_dry %></option>
-            </select>
+          <div class="farmer-stat-grid">
+            <div class="farmer-stat-item">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">My Farm Size</div>
+              <div style="font-size: 20px; font-weight: 800; color: var(--primary-color);"><span id="fd-size">0.0</span> Hectares</div>
+            </div>
+            <div class="farmer-stat-item">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Pest Warning Alerts</div>
+              <div style="font-size: 20px; font-weight: 800; color: #DC3545;" id="fd-pest-warning-count">Active Alerts</div>
+            </div>
+            <div class="farmer-stat-item" style="background-color: rgba(140, 98, 255, 0.08);">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Weekly Usage Badges</div>
+              <div style="font-size: 18px; font-weight: 800; color: var(--accent-color);" id="fd-badges-unlocked-count">1 Unlocked</div>
+            </div>
           </div>
 
-          <button class="btn btn-primary" style="width: 100%;" onclick="getRecommendation()"><%= dict.btn_get_rec %></button>
-          
-          <div class="results-box" id="crop-results">
-            <div class="results-title"><%= dict.text_recommended_crops %>:</div>
-            <div class="results-content" id="crop-results-text"></div>
-          </div>
-        </div>
-
-        <!-- Smart Planting Calendar -->
-        <div class="tool-card">
-          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-calendar-check" style="color: var(--primary-color);"></i>
-            <%= dict.section_calendar_title %>
-          </h3>
-          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_calendar_desc %></p>
-
-          <div class="form-group">
-            <label><%= dict.label_crop %></label>
-            <select class="form-control" id="calendar-crop">
-              <option value="maize">Maize (Masa)</option>
-              <option value="rice">Rice (Shinkafa)</option>
-              <option value="cassava">Cassava (Rogo)</option>
-              <option value="yam">Yam (Doya)</option>
-              <option value="beans">Beans (Wake)</option>
-            </select>
-          </div>
-
-          <button class="btn btn-primary" style="width: 100%;" onclick="getPlantingCalendar()"><%= dict.btn_get_calendar %></button>
-
-          <div class="results-box" id="calendar-results">
-            <div class="results-title"><%= dict.text_planting_window %>:</div>
-            <div class="results-content" id="calendar-results-text"></div>
+          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; margin-top: 24px;">
+            <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 20px; background-color: var(--bg-color);">
+              <h4 style="font-size: 15px; margin-bottom: 12px; color: var(--primary-color);"><i class="fa-solid fa-cloud-sun-rain" style="margin-right: 8px;"></i>Live Climate Threat Alert</h4>
+              <div id="fd-weather-desc" style="font-size: 14px; margin-bottom: 12px; font-weight: 600;">Loading status...</div>
+              <div style="font-size: 13px; color: var(--text-muted);" id="fd-weather-forecast">Forecast details...</div>
+            </div>
+            <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 20px; background-color: var(--bg-color);">
+              <h4 style="font-size: 15px; margin-bottom: 12px; color: var(--accent-color);"><i class="fa-solid fa-seedling" style="margin-right: 8px;"></i>Suggested Seeds</h4>
+              <div id="fd-crops-list" style="font-size: 14px; line-height: 1.5; font-weight: 600;">Loading...</div>
+            </div>
           </div>
         </div>
 
-        <!-- Yield Estimator -->
-        <div class="tool-card">
-          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-calculator" style="color: var(--secondary-color);"></i>
-            <%= dict.section_yield_title %>
-          </h3>
-          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_yield_desc %></p>
+        <!-- PANEL 2: DIAGNOSE PLANT -->
+        <div class="fd-panel" id="panel-diag">
+          <h3 style="margin-bottom: 8px;">AI Plant Disease Diagnoser</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Upload a photo of your leaf or crop. The AI matches it against an agricultural library of diseases and verified cases to return a cure.</p>
 
-          <div class="form-group">
-            <label><%= dict.label_crop %></label>
-            <select class="form-control" id="yield-crop">
-              <option value="maize">Maize (Corn)</option>
-              <option value="rice">Rice</option>
-              <option value="cassava">Cassava</option>
-              <option value="yam">Yam</option>
-            </select>
-          </div>
+          <form id="diag-form" onsubmit="handlePlantDiagnosis(event)">
+            <div class="form-group">
+              <label>Select Crop Category</label>
+              <select class="form-control" id="diag-crop" required>
+                <option value="maize">Maize (Corn)</option>
+                <option value="cassava">Cassava (Rogo)</option>
+                <option value="tomato">Tomato (Tomati)</option>
+                <option value="other">Other Plant / Cereal</option>
+              </select>
+            </div>
 
-          <div class="form-group">
-            <label><%= dict.label_farm_size %></label>
-            <input type="number" class="form-control" id="yield-size" value="2" min="0.1" step="0.1">
-          </div>
+            <!-- Drag & Drop Upload Zone -->
+            <div class="diag-upload-zone" onclick="document.getElementById('diag-file').click()">
+              <i class="fa-solid fa-circle-up" style="font-size: 36px; color: var(--accent-color); margin-bottom: 12px;"></i>
+              <h4 style="font-size: 15px;">Tap to select or take leaf picture</h4>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">PNG, JPG supported (Max 5MB)</p>
+              <input type="file" id="diag-file" style="display: none;" accept="image/*" onchange="previewDiagImage(this)" required>
+            </div>
 
-          <button class="btn btn-primary" style="width: 100%;" onclick="calculateYield()"><%= dict.btn_calculate_yield %></button>
+            <!-- Upload Preview -->
+            <div id="diag-preview-container" style="display: none; text-align: center; margin-bottom: 20px;">
+              <img id="diag-preview-img" src="#" style="max-height: 160px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); object-fit: cover;">
+              <div style="margin-top: 8px;"><button type="button" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="cancelDiagUpload()">Remove</button></div>
+            </div>
 
-          <div class="results-box" id="yield-results">
-            <div class="results-title"><%= dict.text_expected_yield %>:</div>
-            <div class="results-content" id="yield-results-text"></div>
-          </div>
-        </div>
+            <!-- Scan progress meter -->
+            <div class="diag-progress-bar-container" id="diag-progress-container">
+              <div class="diag-progress-bar" id="diag-progress"></div>
+            </div>
+            <div id="diag-scan-status" style="font-size: 13px; font-weight: 700; color: var(--accent-color); text-align: center; display: none; margin-bottom: 20px;">Scanning verified database...</div>
 
-        <!-- Soil Health Advisory -->
-        <div class="tool-card">
-          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-earth-africa" style="color: var(--primary-color);"></i>
-            <%= dict.section_soil_title %>
-          </h3>
-          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_soil_desc %></p>
+            <button type="submit" class="btn btn-accent" style="width: 100%;">Analyze Crop Health</button>
+          </form>
 
-          <div class="form-group">
-            <label><%= dict.label_soil_color %></label>
-            <select class="form-control" id="soil-color">
-              <option value="dark"><%= dict.opt_dark %></option>
-              <option value="reddish"><%= dict.opt_reddish %></option>
-              <option value="light"><%= dict.opt_light %></option>
-            </select>
-          </div>
+          <!-- Diagnostic Results Card -->
+          <div class="results-box" id="diag-results" style="display: none; margin-top: 32px; padding: 24px; border: 1px solid var(--accent-color); background-color: rgba(140, 98, 255, 0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(140, 98, 255, 0.15); padding-bottom: 12px; margin-bottom: 20px;">
+              <h4 style="color: var(--accent-color); font-size: 18px;"><i class="fa-solid fa-square-check" style="margin-right: 8px;"></i>AI Diagnostics Analysis</h4>
+              <span class="trend-badge trend-up" id="diag-match-score">96% Match</span>
+            </div>
 
-          <div class="form-group">
-            <label><%= dict.label_soil_texture %></label>
-            <select class="form-control" id="soil-texture">
-              <option value="loamy"><%= dict.opt_loamy %></option>
-              <option value="sandy"><%= dict.opt_sandy %></option>
-              <option value="clayey"><%= dict.opt_clayey %></option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label><%= dict.label_soil_moisture %></label>
-            <select class="form-control" id="soil-drainage">
-              <option value="moderate"><%= dict.opt_moderate %></option>
-              <option value="fast"><%= dict.opt_fast %></option>
-              <option value="slow"><%= dict.opt_slow %></option>
-            </select>
-          </div>
-
-          <button class="btn btn-primary" style="width: 100%;" onclick="getSoilAdvice()"><%= dict.btn_get_soil_advice %></button>
-
-          <div class="results-box" id="soil-results">
-            <div class="results-title"><%= dict.text_soil_advice %>:</div>
-            <div class="results-content" id="soil-results-text"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SMS & USSD Access Section -->
-  <section class="section section-alt" id="simulator">
-    <div class="container ussd-section-grid">
-      <div class="ussd-info">
-        <h2 class="section-title"><%= dict.section_ussd_title %></h2>
-        <p class="section-desc" style="margin-bottom: 24px;"><%= dict.section_ussd_desc %></p>
-        <p style="font-size: 15px; margin-bottom: 20px;"><%= dict.ussd_dial_inst %></p>
-        <button class="btn btn-accent" onclick="dialUSSD()"><i class="fa-solid fa-phone" style="margin-right: 8px;"></i><%= dict.ussd_btn_dial %></button>
-
-        <!-- SMS Notifications Box -->
-        <div class="phone-sms-box">
-          <h4 style="font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-message" style="color: var(--accent-color);"></i>
-            <%= dict.ussd_sms_title %>
-          </h4>
-          <div class="sms-inbox" id="sms-inbox">
-            <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">No messages received. Use the USSD tool to register.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature Phone Simulator Chassis -->
-      <div class="phone-container">
-        <div class="phone-chassis">
-          <div class="phone-screen">
-            <div class="phone-status-bar">
-              <span id="phone-time">21:04</span>
-              <div class="phone-status-right">
-                <i class="fa-solid fa-signal"></i>
-                <i class="fa-solid fa-wifi"></i>
-                <i class="fa-solid fa-battery-three-quarters"></i>
+            <div class="diag-results-split">
+              <!-- Uploaded leaf vs matched case -->
+              <div class="diag-image-box">
+                <div style="font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted);">YOUR UPLOADED LEAF</div>
+                <img id="diag-res-user-img" src="#" alt="User Upload">
+              </div>
+              <div class="diag-image-box" style="border-left: 1px solid rgba(0,0,0,0.06);">
+                <div style="font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted);">AGRICULTURAL LIBRARY MATCH</div>
+                <img id="diag-res-match-img" src="/images/disease_blight.jpg" alt="Library Match">
               </div>
             </div>
 
-            <!-- Screen Display -->
-            <div class="phone-display" id="phone-display">
-              <!-- Dial Dialer Mode -->
-              <div class="phone-dialer" id="phone-dialer">
-                <div class="dialer-input" id="dialer-input"></div>
-                <div class="dialer-grid">
-                  <button class="dial-btn" onclick="pressKey('1')">1</button>
-                  <button class="dial-btn" onclick="pressKey('2')">2</button>
-                  <button class="dial-btn" onclick="pressKey('3')">3</button>
-                  <button class="dial-btn" onclick="pressKey('4')">4</button>
-                  <button class="dial-btn" onclick="pressKey('5')">5</button>
-                  <button class="dial-btn" onclick="pressKey('6')">6</button>
-                  <button class="dial-btn" onclick="pressKey('7')">7</button>
-                  <button class="dial-btn" onclick="pressKey('8')">8</button>
-                  <button class="dial-btn" onclick="pressKey('9')">9</button>
-                  <button class="dial-btn" onclick="pressKey('*')">*</button>
-                  <button class="dial-btn" onclick="pressKey('0')">0</button>
-                  <button class="dial-btn" onclick="pressKey('#')">#</button>
-                  <button class="dial-btn dial-btn-call" onclick="dialUSSD()"><i class="fa-solid fa-phone"></i></button>
+            <div style="margin-top: 24px; display: grid; gap: 16px;">
+              <div>
+                <strong style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px;">DETECTED PATHOGEN</strong>
+                <span id="diag-res-pathogen" style="font-size: 16px; font-weight: 800; color: #DC3545;">Maize Common Rust</span>
+              </div>
+              <div>
+                <strong style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px;">DAMAGE SEVERITY</strong>
+                <span class="trend-badge" style="background-color: rgba(220, 53, 69, 0.15); color: #dc3545;" id="diag-res-severity">High</span>
+              </div>
+              <div>
+                <strong style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px;">VERIFIED CURE TREATMENT</strong>
+                <p id="diag-res-treatment" style="font-size: 14.5px; line-height: 1.5; color: var(--text-main); font-weight: 500;">Clear resid.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: PEST ALERTS -->
+        <div class="fd-panel" id="panel-pest">
+          <h3 style="margin-bottom: 8px;">National Pest & Bug Alerts</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Live warnings on insect swarms and caterpillar infestations compiled from regional agricultural extensions.</p>
+
+          <div id="pest-alerts-feed-list">
+            <% pestAlerts.forEach(alert => { %>
+              <div class="pest-warning-card <%= alert.severity === 'extreme' ? 'extreme' : '' %>">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <h4 style="font-size: 16px; color: #721C24;"><i class="fa-solid fa-circle-exclamation" style="margin-right: 8px;"></i><%= alert.pest %></h4>
+                  <span class="trend-badge <%= alert.severity === 'extreme' ? 'trend-down' : 'trend-neutral' %>" style="text-transform: uppercase;"><%= alert.severity %></span>
+                </div>
+                <div style="font-size: 13.5px; margin-bottom: 12px;">
+                  <strong>AFFECTED REGIONS:</strong> <span style="color: var(--primary-color); font-weight: 700;"><%= alert.location %></span>
+                </div>
+                <p style="font-size: 14px; margin-bottom: 16px;"><%= alert.description %></p>
+                <div style="background-color: rgba(255,255,255,0.7); border-radius: var(--border-radius-sm); padding: 12px 16px; font-size: 13.5px; border: 1px dashed rgba(0,0,0,0.1);">
+                  <strong>PREVENTION REMEDY:</strong> <%= alert.remedy %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- PANEL 4: USER SETTINGS & BADGES -->
+        <div class="fd-panel" id="panel-profile">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <!-- Left side: profile edit and password change -->
+            <div>
+              <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Profile Photo & Settings</h3>
+              
+              <!-- Photo Upload Uploader Widget -->
+              <div style="text-align: center; margin-bottom: 24px;">
+                <div class="profile-avatar-uploader" onclick="triggerPhotoUpload()">
+                  <img id="fd-profile-avatar" src="/images/onboarding_welcome.jpg" alt="Avatar">
+                  <div class="profile-avatar-hover"><i class="fa-solid fa-camera" style="font-size: 18px; margin-bottom: 4px;"></i>Upload Photo</div>
+                </div>
+                <input type="file" id="profile-photo-input" style="display: none;" accept="image/*" onchange="handlePhotoUpload(this)">
+                <div id="photo-upload-status" style="font-size: 12px; color: var(--accent-color); font-weight: 700; margin-top: 6px;">Tap image to upload new profile photo</div>
+              </div>
+
+              <!-- Profile Form -->
+              <form id="profile-edit-form" onsubmit="handleProfileUpdate(event)" style="margin-bottom: 32px;">
+                <div id="profile-edit-success" class="admin-alert admin-alert-success" style="display: none; padding: 12px; font-size: 13.5px; margin-bottom: 16px;">Profile updated successfully!</div>
+                <div class="form-group">
+                  <label>Full Name</label>
+                  <input type="text" id="prof-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Farm Location</label>
+                  <input type="text" id="prof-location" class="form-control" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div class="form-group">
+                    <label>Size (Hectares)</label>
+                    <input type="number" id="prof-size" class="form-control" step="0.1" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="prof-email" class="form-control">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
+              </form>
+
+              <!-- Password Form -->
+              <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Change Password</h3>
+              <form id="profile-password-form" onsubmit="handlePasswordChange(event)">
+                <div id="password-change-success" class="admin-alert admin-alert-success" style="display: none; padding: 12px; font-size: 13.5px; margin-bottom: 16px;">Password changed successfully!</div>
+                <div id="password-change-error" class="admin-alert" style="display: none; background-color: #F8D7DA; color: #721C24; border: 1px solid #F5C6CB; padding: 12px; font-size: 13.5px; margin-bottom: 16px;"></div>
+                <div class="form-group">
+                  <label>Current Password</label>
+                  <input type="password" id="pass-current" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>New Password</label>
+                  <input type="password" id="pass-new" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width: 100%;">Update Password</button>
+              </form>
+            </div>
+
+            <!-- Right side: badges and queries history -->
+            <div>
+              <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">My Agronomy Badges</h3>
+              <div class="badges-grid">
+                <!-- Seedling Saver -->
+                <div class="badge-card unlocked" id="badge-saver" title="Unlocked upon registering your farm layout.">
+                  <div class="badge-icon">🏅</div>
+                  <div style="font-weight: 700; font-size: 12px;">Seedling Saver</div>
+                  <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Registered Farm</div>
+                </div>
+                <!-- Market Watcher -->
+                <div class="badge-card" id="badge-market" title="Awarded for checking live regional pricing.">
+                  <div class="badge-icon">🏆</div>
+                  <div style="font-weight: 700; font-size: 12px;">Market Watcher</div>
+                  <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Price Checker</div>
+                </div>
+                <!-- Soil Doctor -->
+                <div class="badge-card" id="badge-soil" title="Awarded for updating profile stats or generating soil logs.">
+                  <div class="badge-icon">🌟</div>
+                  <div style="font-weight: 700; font-size: 12px;">Soil Doctor</div>
+                  <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Soil Restorer</div>
+                </div>
+                <!-- Farm Doctor -->
+                <div class="badge-card" id="badge-doctor" title="Unlocked by analyzing diseased leaf scans.">
+                  <div class="badge-icon">🩺</div>
+                  <div style="font-weight: 700; font-size: 12px;">Farm Doctor</div>
+                  <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Plant Diagnosed</div>
+                </div>
+              </div>
+
+              <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Past Queries Log</h3>
+              <div class="history-list" id="fd-history-list">
+                <div class="history-item">
+                  <div>
+                    <strong style="font-size: 14px;">Crop Recommendation</strong>
+                    <div style="font-size: 12px; color: var(--text-muted);">Wet Season, Oyo State</div>
+                  </div>
+                  <div style="font-size: 11px; color: var(--text-muted);">17 Jul 2026</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <div class="footer-logo">
-            <div class="logo-icon" style="background: #fff; color: var(--primary-color);">S</div>
-            <%= site_name %>
+        <!-- PANEL 5: HELP DESK -->
+        <div class="fd-panel" id="panel-help">
+          <h3 style="margin-bottom: 8px;">Seedorra Self-Help & Customer Desk</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Chat live with our mock agronomy assistant or reach customer care support representatives.</p>
+
+          <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md); overflow: hidden; display: flex; flex-direction: column; height: 380px; background-color: var(--bg-color);">
+            <!-- Chat history -->
+            <div style="flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;" id="help-chat-box">
+              <div style="align-self: flex-start; background-color: #FFF; padding: 12px 16px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); max-width: 80%; font-size: 13.5px;">
+                <strong>Seedorra Assistant:</strong> Hello! How can I help you today? Ask me about crop planting, pest treatments, or updating your profile!
+              </div>
+            </div>
+            
+            <!-- Chat Input bar -->
+            <div style="padding: 12px; background-color: #FFF; border-top: 1px solid var(--border-color); display: flex; gap: 12px;">
+              <input type="text" id="chat-input" class="form-control" placeholder="Type your support query here..." onkeyup="if(event.key === 'Enter') sendChatMessage()">
+              <button class="btn btn-primary" onclick="sendChatMessage()" style="padding: 0 24px;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
           </div>
-          <p style="max-width: 320px; line-height: 1.8;">AI-powered advisory services and live pricing statistics for Nigerian farmers.</p>
+          
+          <div style="margin-top: 24px; display: flex; gap: 16px; align-items: center; justify-content: space-between; background-color: rgba(140, 98, 255, 0.04); border: 1px solid rgba(140, 98, 255, 0.1); border-radius: var(--border-radius-md); padding: 20px;">
+            <div>
+              <h4 style="font-size: 15px; color: var(--primary-color);">Need support?</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Toll-free customer line: <strong>080073336772</strong>.</p>
+            </div>
+            <a href="tel:080073336772" class="btn btn-secondary" style="font-size: 13px; padding: 10px 20px;"><i class="fa-solid fa-phone" style="margin-right: 8px;"></i>Call Support</a>
+          </div>
         </div>
-        <div class="footer-link-group">
-          <h4>Features</h4>
-          <ul>
-            <li><a href="#weather">Weather Forecasting</a></li>
-            <li><a href="#prices">Market Pricing</a></li>
-            <li><a href="#tools">AI Crop Matching</a></li>
-            <li><a href="#simulator">USSD/SMS Dialing</a></li>
-          </ul>
-        </div>
-        <div class="footer-link-group">
-          <h4>Support Languages</h4>
-          <ul>
-            <li>English</li>
-            <li>Yoruba (Yorùbá)</li>
-            <li>Hausa (Harshen Hausa)</li>
-            <li>Igbo (Asụsụ Igbo)</li>
-            <li>Pidgin English</li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>&copy; 2026 <%= site_name %> Inc. All rights reserved.</span>
-        <span>Empowering Agriculture with Intelligence.</span>
+
       </div>
     </div>
-  </footer>
+  </div>
 
-  <!-- Script logic for calculators and interactive components -->
+  <!-- MAIN HOMEPAGE CONTENT WRAPPER (Locked/Hidden until authenticated) -->
+  <div id="main-homepage-content" style="display: none;">
+    <!-- Header -->
+    <header>
+      <div class="container nav-wrapper">
+        <a href="/" class="logo-link">
+          <div class="logo-icon">S</div>
+          <%= site_name %>
+        </a>
+        
+        <nav id="nav-menu">
+          <a href="#home" class="active"><%= dict.nav_home %></a>
+          <a href="#prices"><%= dict.nav_prices %></a>
+          <a href="#tools"><%= dict.nav_tools %></a>
+          
+          <span id="header-profile-badge" style="display: flex; align-items: center; gap: 12px;">
+            <a href="#" onclick="openFarmerDashboard()" style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-circle-user" style="color: var(--primary-color); font-size: 18px;"></i><span id="header-profile-name">Farmer</span></a>
+            <a href="#" onclick="logoutFarmer()" style="font-size: 13px; color: var(--text-muted); text-decoration: underline;">Log Out</a>
+          </span>
+        </nav>
+
+        <div class="lang-selector">
+          <select class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en" <%= lang === 'en' ? 'selected' : '' %>>🇬🇧 English</option>
+            <option value="yo" <%= lang === 'yo' ? 'selected' : '' %>>🇳🇬 Yoruba</option>
+            <option value="ha" <%= lang === 'ha' ? 'selected' : '' %>>🇳🇬 Hausa</option>
+            <option value="ig" <%= lang === 'ig' ? 'selected' : '' %>>🇳🇬 Igbo</option>
+            <option value="pcm" <%= lang === 'pcm' ? 'selected' : '' %>>🇳🇬 Pidgin</option>
+          </select>
+        </div>
+
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <h1 class="hero-title"><span><%= dict.hero_title %></span></h1>
+          <p class="hero-subtitle"><%= dict.hero_subtitle %></p>
+          <div class="hero-actions">
+            <a href="#tools" class="btn btn-primary"><%= dict.btn_get_started %></a>
+            <a href="#prices" class="btn btn-secondary"><%= dict.btn_explore_prices %></a>
+          </div>
+        </div>
+        <div class="hero-image-wrapper">
+          <div style="background: linear-gradient(135deg, rgba(86, 178, 89, 0.2), rgba(140, 98, 255, 0.15)); width: 100%; height: 380px; border-radius: var(--border-radius-lg); display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-lg);">
+            <div style="text-align: center; padding: 40px; z-index: 2;">
+              <i class="fa-solid fa-seedling" style="font-size: 72px; color: var(--primary-color); margin-bottom: 20px;"></i>
+              <h3 style="font-size: 24px; margin-bottom: 8px;"><%= site_name %> AI Advisor</h3>
+              <p style="font-size: 14px; color: var(--text-muted); max-width: 280px; margin: 0 auto;">Optimized crop management for smallholder farmers across Nigeria.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Weather & Alerts Section -->
+    <section class="section" id="weather">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title"><%= dict.section_weather_title %></h2>
+          <p class="section-desc"><%= dict.section_weather_desc %></p>
+        </div>
+
+        <div class="tools-grid">
+          <div class="weather-card">
+            <div class="weather-header-row">
+              <h3 style="font-size: 20px;"><i class="fa-solid fa-cloud-sun" style="color: var(--secondary-color); margin-right: 10px;"></i><%= dict.label_select_region %></h3>
+              <select class="form-control" style="width: auto; padding: 8px 16px;" id="weather-region-select" onchange="updateWeather(this.value)">
+                <option value="SW">South-West (Lagos/Ibadan)</option>
+                <option value="SE">South-East (Enugu/Onitsha)</option>
+                <option value="NW">North-West (Kano/Kaduna)</option>
+                <option value="NE">North-East (Maiduguri/Bauchi)</option>
+                <option value="SS">South-South (Port Harcourt)</option>
+              </select>
+            </div>
+
+            <div class="weather-info">
+              <i class="fa-solid fa-cloud-showers-heavy" id="weather-icon" style="font-size: 48px; color: var(--primary-color);"></i>
+              <div>
+                <div class="weather-temp" id="weather-temp">30°C</div>
+                <div style="font-size: 14px; color: var(--text-muted);" id="weather-forecast">Heavy Thunderstorms expected tomorrow.</div>
+              </div>
+            </div>
+
+            <div class="weather-details">
+              <div class="weather-detail-item">
+                <div class="weather-detail-label"><%= dict.label_temp %></div>
+                <div class="weather-detail-val" id="detail-temp">30°C</div>
+              </div>
+              <div class="weather-detail-item">
+                <div class="weather-detail-label"><%= dict.label_humidity %></div>
+                <div class="weather-detail-val" id="detail-humidity">82%</div>
+              </div>
+              <div class="weather-detail-item" style="grid-column: span 2;">
+                <div class="weather-detail-label"><%= dict.label_wind %></div>
+                <div class="weather-detail-val" id="detail-wind">14 km/h</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone-container" style="display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+            <div class="alert-box alert-severe" id="weather-alert-card">
+              <div class="alert-header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span><%= dict.label_active_alert %></span>
+              </div>
+              <div class="alert-message" id="weather-alert-message">
+                Rainfall warning: High flood risk in low-lying farmlands. Clear drainage channels.
+              </div>
+            </div>
+            
+            <div class="alert-box" style="background: linear-gradient(135deg, #FDF3F4, #FADBD8); border-left: 6px solid #DC3545; color: #721C24;">
+              <div class="alert-header">
+                <i class="fa-solid fa-bug"></i>
+                <strong>Active Pest Outbreak Warning</strong>
+              </div>
+              <div class="alert-message" style="font-size: 13.5px;">
+                <strong>Armyworm Outbreak</strong>: Active warnings in South-West states. Sprays recommended early morning.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Market Prices Section -->
+    <section class="section section-alt" id="prices">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title"><%= dict.section_prices_title %></h2>
+          <p class="section-desc"><%= dict.section_prices_desc %></p>
+        </div>
+
+        <div class="prices-wrapper">
+          <table class="price-table">
+            <thead>
+              <tr>
+                <th><%= dict.price_col_commodity %></th>
+                <th><%= dict.price_col_size %></th>
+                <th><%= dict.price_col_current %></th>
+                <th><%= dict.price_col_prev %></th>
+                <th><%= dict.price_col_trend %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% prices.forEach(item => { %>
+                <tr>
+                  <td style="font-weight: 600;"><%= item.name %></td>
+                  <td><%= item.size %></td>
+                  <td style="font-weight: 700;">₦<%= item.current %></td>
+                  <td style="color: var(--text-muted);">₦<%= item.previous %></td>
+                  <td>
+                    <% if (item.trend === 'up') { %>
+                      <span class="trend-badge trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ▲ ₦<%= item.diff.toLocaleString() %></span>
+                    <% } else if (item.trend === 'down') { %>
+                      <span class="trend-badge trend-down"><i class="fa-solid fa-arrow-trend-down"></i> ▼ ₦<%= Math.abs(item.diff).toLocaleString() %></span>
+                    <% } else { %>
+                      <span class="trend-badge trend-neutral"><i class="fa-solid fa-minus"></i> Stable</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advisory Tools Section -->
+    <section class="section" id="tools">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title"><%= dict.nav_tools %></h2>
+          <p class="section-desc">Generate predictions, estimations, and advisories to increase your yield output.</p>
+        </div>
+
+        <div class="tools-grid">
+          
+          <div class="tool-card" style="border: 1px solid var(--accent-color); background-color: rgba(140, 98, 255, 0.01);">
+            <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-kit-medical" style="color: var(--accent-color);"></i>
+              Diagnose Plant Health
+            </h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Upload or capture a photo of a leaf to identify crop diseases instantly and unlock verified cure details.</p>
+            <button class="btn btn-accent" style="width: 100%;" onclick="openFarmerDashboardDiagnostic()"><i class="fa-solid fa-camera" style="margin-right: 8px;"></i>Open Health Scanner</button>
+          </div>
+
+          <div class="tool-card">
+            <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary-color);"></i>
+              <%= dict.section_crop_title %>
+            </h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_crop_desc %></p>
+            
+            <div class="form-group">
+              <label><%= dict.label_state %></label>
+              <select class="form-control" id="crop-state">
+                <option value="South">Oyo / Osun / Ondo (West)</option>
+                <option value="South">Enugu / Anambra / Imo (East)</option>
+                <option value="North">Kano / Kaduna / Katsina (North)</option>
+                <option value="North">Borno / Adamawa / Bauchi (North-East)</option>
+                <option value="South">Rivers / Delta / Akwa Ibom (South)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label><%= dict.label_season %></label>
+              <select class="form-control" id="crop-season">
+                <option value="wet"><%= dict.opt_wet %></option>
+                <option value="dry"><%= dict.opt_dry %></option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="getRecommendation()"><%= dict.btn_get_rec %></button>
+            
+            <div class="results-box" id="crop-results">
+              <div class="results-title"><%= dict.text_recommended_crops %>:</div>
+              <div class="results-content" id="crop-results-text"></div>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-calendar-check" style="color: var(--secondary-color);"></i>
+              <%= dict.section_calendar_title %>
+            </h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_calendar_desc %></p>
+
+            <div class="form-group">
+              <label><%= dict.label_crop %></label>
+              <select class="form-control" id="calendar-crop">
+                <option value="maize">Maize (Masa)</option>
+                <option value="rice">Rice (Shinkafa)</option>
+                <option value="cassava">Cassava (Rogo)</option>
+                <option value="yam">Yam (Doya)</option>
+                <option value="beans">Beans (Wake)</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="getPlantingCalendar()"><%= dict.btn_get_calendar %></button>
+
+            <div class="results-box" id="calendar-results">
+              <div class="results-title"><%= dict.text_planting_window %>:</div>
+              <div class="results-content" id="calendar-results-text"></div>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-calculator" style="color: var(--primary-color);"></i>
+              <%= dict.section_yield_title %>
+            </h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_yield_desc %></p>
+
+            <div class="form-group">
+              <label><%= dict.label_crop %></label>
+              <select class="form-control" id="yield-crop">
+                <option value="maize">Maize (Corn)</option>
+                <option value="rice">Rice</option>
+                <option value="cassava">Cassava</option>
+                <option value="yam">Yam</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label><%= dict.label_farm_size %></label>
+              <input type="number" class="form-control" id="yield-size" value="2" min="0.1" step="0.1">
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="calculateYield()"><%= dict.btn_calculate_yield %></button>
+
+            <div class="results-box" id="yield-results">
+              <div class="results-title"><%= dict.text_expected_yield %>:</div>
+              <div class="results-content" id="yield-results-text"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <div class="footer-logo">
+              <div class="logo-icon" style="background: #fff; color: var(--primary-color);">S</div>
+              <%= site_name %>
+            </div>
+            <p style="max-width: 320px; line-height: 1.8;">AI-powered advisory services and live pricing statistics for Nigerian farmers.</p>
+          </div>
+          <div class="footer-link-group">
+            <h4>Features</h4>
+            <ul>
+              <li><a href="#weather">Weather Forecasting</a></li>
+              <li><a href="#prices">Market Pricing</a></li>
+              <li><a href="#tools">AI Crop Matching</a></li>
+            </ul>
+          </div>
+          <div class="footer-link-group">
+            <h4>Support Languages</h4>
+            <ul>
+              <li>English</li>
+              <li>Yoruba (Yorùbá)</li>
+              <li>Hausa (Harshen Hausa)</li>
+              <li>Igbo (Asụsụ Igbo)</li>
+              <li>Pidgin English</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>&copy; 2026 <%= site_name %> Inc. All rights reserved.</span>
+          <span>Empowering Agriculture with Intelligence.</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
   <script>
-    // General language redirect
+    // Language control redirect
     function changeLanguage(val) {
       window.location.href = `/?lang=${val}`;
     }
@@ -438,20 +859,7 @@
       menu.classList.toggle('mobile-active');
     }
 
-    // Set phone clock
-    function updateClock() {
-      const clock = document.getElementById('phone-time');
-      const now = new Date();
-      let hours = now.getHours();
-      let minutes = now.getMinutes();
-      hours = hours < 10 ? '0' + hours : hours;
-      minutes = minutes < 10 ? '0' + minutes : minutes;
-      clock.textContent = `${hours}:${minutes}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Weather widget logic
+    // Weather warning alert update
     const weatherData = <%- JSON.stringify(weatherData) %>;
     function updateWeather(region) {
       const w = weatherData[region];
@@ -469,7 +877,6 @@
         alertCard.className = 'alert-box';
       }
       
-      // Update weather icon based on state
       const icon = document.getElementById('weather-icon');
       if (region === 'NW' || region === 'NE') {
         icon.className = 'fa-solid fa-sun';
@@ -479,9 +886,616 @@
         icon.style.color = 'var(--primary-color)';
       }
     }
-    updateWeather('SW'); // Initialize
+    updateWeather('SW');
 
-    // Crop Recommendation Logic
+    // --- Onboarding auto slide deck transitions ---
+    let currentOnboardingSlide = 0;
+    let onboardingTimer = null;
+
+    function startOnboardingTimer() {
+      stopOnboardingTimer();
+      onboardingTimer = setInterval(() => {
+        let nextIdx = (currentOnboardingSlide + 1) % 5;
+        nextSlide(nextIdx);
+      }, 10000); // 10 seconds auto-slide
+    }
+
+    function stopOnboardingTimer() {
+      if (onboardingTimer) {
+        clearInterval(onboardingTimer);
+        onboardingTimer = null;
+      }
+    }
+
+    function nextSlide(currentIndex) {
+      currentOnboardingSlide = currentIndex;
+      const slidesContainer = document.getElementById('onboarding-slides');
+      const offset = currentOnboardingSlide * -20;
+      slidesContainer.style.transform = `translateX(${offset}%)`;
+      startOnboardingTimer();
+    }
+
+    // IP-based onboarding completion controller
+    function finishOnboarding(targetTab) {
+      stopOnboardingTimer();
+      document.getElementById('onboarding-overlay').style.display = 'none';
+      
+      // Call backend to mark IP as onboarding finished
+      fetch('/api/onboarding/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Show gateway login card
+        document.getElementById('gateway-auth-overlay').style.display = 'flex';
+        if (targetTab) {
+          switchGatewayTab(targetTab);
+        } else {
+          switchGatewayTab('login');
+        }
+      });
+    }
+
+    // --- Gateway Authentication Form Screen controls ---
+    let isGatewayAdminActive = false;
+
+    function switchGatewayTab(tab) {
+      const btnLogin = document.getElementById('gt-tab-login');
+      const btnReg = document.getElementById('gt-tab-register');
+      const pnlLogin = document.getElementById('gt-panel-login');
+      const pnlReg = document.getElementById('gt-panel-register');
+      const pnlSuccess = document.getElementById('gt-panel-success');
+
+      document.getElementById('gateway-error').style.display = 'none';
+
+      if (tab === 'login') {
+        btnLogin.style.backgroundColor = "var(--surface-color)";
+        btnLogin.style.color = "var(--primary-color)";
+        btnLogin.style.boxShadow = "var(--shadow-sm)";
+        btnReg.style.backgroundColor = "transparent";
+        btnReg.style.color = "var(--text-muted)";
+        btnReg.style.boxShadow = "none";
+        
+        pnlLogin.style.display = 'block';
+        pnlReg.style.display = 'none';
+        pnlSuccess.style.display = 'none';
+      } else {
+        btnReg.style.backgroundColor = "var(--surface-color)";
+        btnReg.style.color = "var(--primary-color)";
+        btnReg.style.boxShadow = "var(--shadow-sm)";
+        btnLogin.style.backgroundColor = "transparent";
+        btnLogin.style.color = "var(--text-muted)";
+        btnLogin.style.boxShadow = "none";
+        
+        pnlReg.style.display = 'block';
+        pnlLogin.style.display = 'none';
+        pnlSuccess.style.display = 'none';
+      }
+    }
+
+    function toggleGatewayAdminLogin(e) {
+      if (e) e.preventDefault();
+      isGatewayAdminActive = !isGatewayAdminActive;
+
+      const labelUser = document.getElementById('gt-label-username');
+      const labelCred = document.getElementById('gt-label-credential');
+      const inputUser = document.getElementById('gt-login-username');
+      const inputCred = document.getElementById('gt-login-credential');
+      const link = document.getElementById('gt-admin-toggle-link');
+      const txt = document.getElementById('gt-admin-toggle-text');
+
+      if (isGatewayAdminActive) {
+        labelUser.textContent = "Admin Username";
+        labelCred.textContent = "Password";
+        inputUser.placeholder = "e.g. admin";
+        inputCred.placeholder = "Enter admin password";
+        txt.textContent = "Are you a farmer?";
+        link.textContent = "Sign In as Farmer";
+      } else {
+        labelUser.textContent = "Farmer's Full Name";
+        labelCred.textContent = "Password / Phone Number";
+        inputUser.placeholder = "e.g. Bamidele Alao";
+        inputCred.placeholder = "Enter password or phone number";
+        txt.textContent = "Are you a system administrator?";
+        link.textContent = "Sign In as Admin";
+      }
+
+      inputUser.value = "";
+      inputCred.value = "";
+      document.getElementById('gateway-error').style.display = 'none';
+    }
+
+    function handleGatewayLogin(e) {
+      if (e) e.preventDefault();
+      const name = document.getElementById('gt-login-username').value.trim();
+      const phone = document.getElementById('gt-login-credential').value.trim();
+      const errorDiv = document.getElementById('gateway-error');
+      
+      errorDiv.style.display = 'none';
+
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          if (data.role === 'admin') {
+            window.location.href = data.redirect;
+          } else {
+            // Unlock and open dashboard
+            document.getElementById('gateway-auth-overlay').style.display = 'none';
+            document.getElementById('main-homepage-content').style.display = 'block';
+            openFarmerDashboard(data.user, data.dashboardData);
+          }
+        } else {
+          errorDiv.textContent = data.message;
+          errorDiv.style.display = 'block';
+        }
+      });
+    }
+
+    function handleGatewayRegister(e) {
+      if (e) e.preventDefault();
+      const name = document.getElementById('gt-reg-name').value.trim();
+      const location = document.getElementById('gt-reg-location').value.trim();
+      const size = document.getElementById('gt-reg-size').value.trim();
+      const phone = document.getElementById('gt-reg-phone').value.trim();
+      const password = document.getElementById('gt-reg-password').value.trim();
+      const email = document.getElementById('gt-reg-email').value.trim();
+      const errorDiv = document.getElementById('gateway-error');
+
+      errorDiv.style.display = 'none';
+
+      fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, location, size, phone, password, email })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Slide to success panel view
+          document.getElementById('gt-panel-register').style.display = 'none';
+          document.getElementById('gt-panel-success').style.display = 'block';
+        } else {
+          errorDiv.textContent = data.error;
+          errorDiv.style.display = 'block';
+        }
+      });
+    }
+
+    function togglePasswordVisibility(fieldId) {
+      const input = document.getElementById(fieldId);
+      const eye = document.getElementById(fieldId + '-eye');
+      if (input.type === "password") {
+        input.type = "text";
+        eye.className = "fa-solid fa-eye-slash";
+      } else {
+        input.type = "password";
+        eye.className = "fa-solid fa-eye";
+      }
+    }
+
+    // --- Dashboard Tabs Control ---
+    function switchTab(tabName) {
+      document.querySelectorAll('.fd-tab-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.getElementById('tab-' + tabName).classList.add('active');
+
+      document.querySelectorAll('.fd-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      document.getElementById('panel-' + tabName).classList.add('active');
+    }
+
+    // --- Live News Updates Carousel (Farmer Dashboard Feed) ---
+    let currentNewsSlide = 0;
+    let newsTimer = null;
+
+    function startNewsCarousel() {
+      stopNewsCarousel();
+      const slides = document.querySelectorAll('.news-slide');
+      if (slides.length === 0) return;
+
+      newsTimer = setInterval(() => {
+        slides[currentNewsSlide].classList.remove('active');
+        currentNewsSlide = (currentNewsSlide + 1) % slides.length;
+        slides[currentNewsSlide].classList.add('active');
+      }, 5000);
+    }
+
+    function stopNewsCarousel() {
+      if (newsTimer) {
+        clearInterval(newsTimer);
+        newsTimer = null;
+      }
+    }
+
+    // --- Farmer Custom Dashboard UI controls ---
+    let loggedFarmer = null;
+
+    function openFarmerDashboard(user, data) {
+      if (user && data) {
+        loggedFarmer = { user, data };
+        localStorage.setItem('loggedFarmer', JSON.stringify(loggedFarmer));
+      } else {
+        const cached = localStorage.getItem('loggedFarmer');
+        if (cached) {
+          loggedFarmer = JSON.parse(cached);
+        } else {
+          // If no cached farmer: show the gateway overlay
+          document.getElementById('main-homepage-content').style.display = 'none';
+          document.getElementById('gateway-auth-overlay').style.display = 'flex';
+          switchGatewayTab('login');
+          return;
+        }
+      }
+
+      // Populate dashboard values
+      document.getElementById('fd-welcome-title').textContent = loggedFarmer.user.name;
+      document.getElementById('fd-location').textContent = loggedFarmer.user.location;
+      document.getElementById('fd-size').textContent = loggedFarmer.user.size;
+      
+      const photoPath = loggedFarmer.user.profile_photo || '/images/onboarding_welcome.jpg';
+      document.getElementById('fd-header-avatar').src = photoPath;
+      document.getElementById('fd-profile-avatar').src = photoPath;
+
+      const w = loggedFarmer.data ? loggedFarmer.data.weather : { alert: "Soil Saturation Warning", forecast: "Continuous rainfall", temp: "29°C" };
+      document.getElementById('fd-weather-desc').textContent = w.alert;
+      document.getElementById('fd-weather-forecast').textContent = `Forecast: ${w.forecast} (${w.temp})`;
+      
+      document.getElementById('fd-pest-warning-count').textContent = '3 Active Alerts';
+
+      // Load Profile form fields
+      document.getElementById('prof-name').value = loggedFarmer.user.name;
+      document.getElementById('prof-location').value = loggedFarmer.user.location;
+      document.getElementById('prof-size').value = loggedFarmer.user.size;
+      document.getElementById('prof-email').value = loggedFarmer.user.email || '';
+
+      // Populate badges & history
+      updateBadgesUI(loggedFarmer.user.badges);
+      renderQueriesHistory(loggedFarmer.user.queries);
+
+      // Update Header
+      document.getElementById('header-profile-name').textContent = loggedFarmer.user.name;
+      document.getElementById('header-profile-badge').style.display = 'flex';
+
+      // Open layout overlay
+      document.getElementById('farmer-dashboard-overlay').classList.add('active');
+      switchTab('feed');
+      startNewsCarousel();
+    }
+
+    function openFarmerDashboardDiagnostic() {
+      openFarmerDashboard();
+      switchTab('diag');
+    }
+
+    function updateBadgesUI(badgesArray) {
+      document.querySelectorAll('.badge-card').forEach(card => card.classList.remove('unlocked'));
+      let count = 0;
+      if (badgesArray) {
+        badgesArray.forEach(badge => {
+          count++;
+          if (badge.includes("Saver")) document.getElementById('badge-saver').classList.add('unlocked');
+          if (badge.includes("Watcher")) document.getElementById('badge-market').classList.add('unlocked');
+          if (badge.includes("Doctor") && !badge.includes("Farm")) document.getElementById('badge-soil').classList.add('unlocked');
+          if (badge.includes("Farm")) document.getElementById('badge-doctor').classList.add('unlocked');
+        });
+      }
+      document.getElementById('fd-badges-unlocked-count').textContent = `${count} Unlocked`;
+    }
+
+    function renderQueriesHistory(queriesArray) {
+      const container = document.getElementById('fd-history-list');
+      if (!queriesArray || queriesArray.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">No past calculations recorded.</div>`;
+        return;
+      }
+
+      let html = "";
+      queriesArray.slice().reverse().forEach(q => {
+        html += `
+          <div class="history-item">
+            <div>
+              <strong style="font-size: 14px;">${q.type}</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">${q.input} &rarr; ${q.result}</div>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted);">${q.date}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function closeFarmerDashboard() {
+      document.getElementById('farmer-dashboard-overlay').classList.remove('active');
+      stopNewsCarousel();
+    }
+
+    function logoutFarmer() {
+      loggedFarmer = null;
+      localStorage.removeItem('loggedFarmer');
+      
+      // Reload page to reset authentication overlays cleanly
+      window.location.reload();
+    }
+
+    // --- Profile Editing Submit Handlers ---
+    function handleProfileUpdate(e) {
+      if (e) e.preventDefault();
+      const name = document.getElementById('prof-name').value.trim();
+      const location = document.getElementById('prof-location').value.trim();
+      const size = document.getElementById('prof-size').value.trim();
+      const email = document.getElementById('prof-email').value.trim();
+      const successDiv = document.getElementById('profile-edit-success');
+
+      successDiv.style.display = 'none';
+
+      fetch('/api/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: loggedFarmer.user.phone,
+          name, location, size, email
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          loggedFarmer.user = data.user;
+          localStorage.setItem('loggedFarmer', JSON.stringify(loggedFarmer));
+          
+          document.getElementById('fd-welcome-title').textContent = data.user.name;
+          document.getElementById('fd-location').textContent = data.user.location;
+          document.getElementById('fd-size').textContent = data.user.size;
+          document.getElementById('header-profile-name').textContent = data.user.name;
+          
+          updateBadgesUI(data.user.badges);
+
+          successDiv.style.display = 'block';
+          setTimeout(() => successDiv.style.display = 'none', 4000);
+        }
+      });
+    }
+
+    function handlePasswordChange(e) {
+      if (e) e.preventDefault();
+      const currentPassword = document.getElementById('pass-current').value.trim();
+      const newPassword = document.getElementById('pass-new').value.trim();
+      const successDiv = document.getElementById('password-change-success');
+      const errorDiv = document.getElementById('password-change-error');
+
+      successDiv.style.display = 'none';
+      errorDiv.style.display = 'none';
+
+      fetch('/api/profile/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: loggedFarmer.user.phone,
+          currentPassword, newPassword
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          loggedFarmer.user.password = newPassword;
+          localStorage.setItem('loggedFarmer', JSON.stringify(loggedFarmer));
+          
+          document.getElementById('profile-password-form').reset();
+          successDiv.style.display = 'block';
+          setTimeout(() => successDiv.style.display = 'none', 4000);
+        } else {
+          errorDiv.textContent = data.error;
+          errorDiv.style.display = 'block';
+        }
+      });
+    }
+
+    // --- Profile Photo Uploading ---
+    function triggerPhotoUpload() {
+      document.getElementById('profile-photo-input').click();
+    }
+
+    function handlePhotoUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const status = document.getElementById('photo-upload-status');
+        status.textContent = "Uploading profile photo...";
+
+        const formData = new FormData();
+        formData.append('profile_photo', file);
+        formData.append('phone', loggedFarmer.user.phone);
+
+        fetch('/api/profile/upload-photo', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            loggedFarmer.user.profile_photo = data.photoPath;
+            localStorage.setItem('loggedFarmer', JSON.stringify(loggedFarmer));
+            
+            document.getElementById('fd-header-avatar').src = data.photoPath;
+            document.getElementById('fd-profile-avatar').src = data.photoPath;
+            status.textContent = "Upload complete! Avatar updated.";
+            setTimeout(() => status.textContent = "Tap image to upload new profile photo", 3000);
+          } else {
+            status.textContent = "Upload failed. Try again.";
+          }
+        });
+      }
+    }
+
+    // --- AI Plant Disease Diagnosis ---
+    let selectedDiagImgSrc = "";
+
+    function previewDiagImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          selectedDiagImgSrc = e.target.result;
+          document.getElementById('diag-preview-img').src = selectedDiagImgSrc;
+          document.getElementById('diag-preview-container').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function cancelDiagUpload() {
+      document.getElementById('diag-file').value = "";
+      document.getElementById('diag-preview-container').style.display = 'none';
+      selectedDiagImgSrc = "";
+    }
+
+    function handlePlantDiagnosis(e) {
+      if (e) e.preventDefault();
+      const crop = document.getElementById('diag-crop').value;
+      const fileInput = document.getElementById('diag-file');
+      
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a leaf photo first.");
+        return;
+      }
+
+      document.getElementById('diag-results').style.display = 'none';
+      document.getElementById('diag-progress-container').style.display = 'block';
+      const statusText = document.getElementById('diag-scan-status');
+      statusText.style.display = 'block';
+      statusText.textContent = "Uploading crop scan...";
+
+      const progressBar = document.getElementById('diag-progress');
+      progressBar.style.width = "0%";
+
+      let pWidth = 0;
+      const interval = setInterval(() => {
+        pWidth += 10;
+        progressBar.style.width = pWidth + "%";
+        
+        if (pWidth === 30) statusText.textContent = "Scanning agricultural disease library...";
+        if (pWidth === 70) statusText.textContent = "Comparing matching verified case logs...";
+        
+        if (pWidth >= 100) {
+          clearInterval(interval);
+          submitDiagRequest();
+        }
+      }, 250);
+
+      function submitDiagRequest() {
+        const formData = new FormData();
+        formData.append('plant_photo', fileInput.files[0]);
+        formData.append('crop', crop);
+        formData.append('phone', loggedFarmer.user.phone);
+
+        fetch('/api/diagnose', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('diag-progress-container').style.display = 'none';
+          statusText.style.display = 'none';
+
+          if (data.success) {
+            document.getElementById('diag-res-user-img').src = selectedDiagImgSrc;
+            document.getElementById('diag-res-match-img').src = data.matchedCaseImage;
+            document.getElementById('diag-res-pathogen').textContent = data.diagnosis;
+            document.getElementById('diag-res-severity').textContent = data.severity;
+            document.getElementById('diag-res-treatment').innerHTML = data.cure.replace(/\. /g, '.<br>&bull; ');
+            document.getElementById('diag-match-score').textContent = data.matchScore;
+
+            const badge = document.getElementById('diag-res-severity');
+            if (data.severity.toLowerCase() === 'severe') {
+              badge.style.backgroundColor = "rgba(220, 53, 69, 0.15)";
+              badge.style.color = "#dc3545";
+            } else if (data.severity.toLowerCase() === 'high') {
+              badge.style.backgroundColor = "rgba(255, 193, 7, 0.15)";
+              badge.style.color = "#FFC107";
+            } else {
+              badge.style.backgroundColor = "rgba(40, 167, 69, 0.15)";
+              badge.style.color = "#28a745";
+            }
+
+            document.getElementById('diag-results').style.display = 'block';
+            fetchQueriesUpdate();
+          }
+        });
+      }
+    }
+
+    function fetchQueriesUpdate() {
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: loggedFarmer.user.name, phone: loggedFarmer.user.phone })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          loggedFarmer.user = data.user;
+          localStorage.setItem('loggedFarmer', JSON.stringify(loggedFarmer));
+          updateBadgesUI(data.user.badges);
+          renderQueriesHistory(data.user.queries);
+        }
+      });
+    }
+
+    // --- Support Chatbot Desk Simulation ---
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (text === "") return;
+
+      const chatBox = document.getElementById('help-chat-box');
+
+      const userBubble = document.createElement('div');
+      userBubble.style.alignSelf = "flex-end";
+      userBubble.style.backgroundColor = "var(--primary-color)";
+      userBubble.style.color = "#FFF";
+      userBubble.style.padding = "12px 16px";
+      userBubble.style.borderRadius = "var(--border-radius-sm)";
+      userBubble.style.maxWidth = "80%";
+      userBubble.style.fontSize = "13.5px";
+      userBubble.innerHTML = `<strong>You:</strong> ${text}`;
+      chatBox.appendChild(userBubble);
+
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(() => {
+        const botBubble = document.createElement('div');
+        botBubble.style.alignSelf = "flex-start";
+        botBubble.style.backgroundColor = "#FFF";
+        botBubble.style.padding = "12px 16px";
+        botBubble.style.borderRadius = "var(--border-radius-sm)";
+        botBubble.style.border = "1px solid var(--border-color)";
+        botBubble.style.maxWidth = "80%";
+        botBubble.style.fontSize = "13.5px";
+
+        let reply = "Thank you for reaching out. An agricultural advisor has been notified of your question and will reply via SMS text shortly.";
+        const lowText = text.toLowerCase();
+        
+        if (lowText.includes("crop") || lowText.includes("plant") || lowText.includes("seed")) {
+          reply = "For crop advice, you can use our <strong>AI Diagnose</strong> tab to upload a leaf scan, or check our <strong>Suggested Seeds</strong> listed in the main feed tab!";
+        } else if (lowText.includes("weather") || lowText.includes("rain")) {
+          reply = "The current weather reports suggest rainfall changes. You can view your local <strong>Live Climate Threat Alert</strong> under the main Feed tab.";
+        } else if (lowText.includes("password") || lowText.includes("profile")) {
+          reply = "You can modify your name, location, password, or upload a new photo directly under the <strong>Profile & Badges</strong> tab in this window.";
+        }
+
+        botBubble.innerHTML = `<strong>Seedorra Assistant:</strong> ${reply}`;
+        chatBox.appendChild(botBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 1000);
+    }
+
+    // --- Agronomy Advisory Utilities ---
     function getRecommendation() {
       const state = document.getElementById('crop-state').value;
       const season = document.getElementById('crop-season').value;
@@ -501,9 +1515,10 @@
       
       resultsText.innerHTML = crops.replace(/\n/g, '<br>');
       resultsDiv.style.display = 'block';
+
+      awardBadgeSilently("Market Watcher");
     }
 
-    // Planting Calendar Logic
     function getPlantingCalendar() {
       const crop = document.getElementById('calendar-crop').value;
       const resultsDiv = document.getElementById('calendar-results');
@@ -519,9 +1534,10 @@
 
       resultsText.innerHTML = calendar[crop];
       resultsDiv.style.display = 'block';
+      
+      awardBadgeSilently("Market Watcher");
     }
 
-    // Yield Estimator
     function calculateYield() {
       const crop = document.getElementById('yield-crop').value;
       const size = parseFloat(document.getElementById('yield-size').value) || 0;
@@ -534,7 +1550,6 @@
         return;
       }
 
-      // bags per hectare estimation
       const yields = {
         maize: { bags: 45, unit: "bags (50kg)" },
         rice: { bags: 80, unit: "bags (50kg)" },
@@ -545,204 +1560,55 @@
       const rate = yields[crop].bags;
       const total = Math.round(rate * size);
       
-      resultsText.innerHTML = `🌾 Your estimated yield for <strong>${size} Hectares</strong> is:<br><span style="font-size: 24px; font-weight: 800; color: var(--primary-color);">${total.toLocaleString()}</span> ${yields[crop].unit}.<br><span style="font-size: 12px; color: var(--text-muted);">*Based on recommended spacing, healthy fertilizer input and moderate rainfall.</span>`;
+      resultsText.innerHTML = `🌾 Your estimated yield for <strong>${size} Hectares</strong> is:<br><span style="font-size: 24px; font-weight: 800; color: var(--primary-color);">${total.toLocaleString()}</span> ${yields[crop].unit}.`;
       resultsDiv.style.display = 'block';
     }
 
-    // Soil Advisory
-    function getSoilAdvice() {
-      const color = document.getElementById('soil-color').value;
-      const texture = document.getElementById('soil-texture').value;
-      const drainage = document.getElementById('soil-drainage').value;
-      const resultsDiv = document.getElementById('soil-results');
-      const resultsText = document.getElementById('soil-results-text');
-      
-      let advice = "";
-      if (texture === 'clayey') {
-        advice = "💡 <strong>Clayey Clay Advisory</strong>:<br>" +
-                 "- Soil holds water too long. Apply organic manure or compost to loosen blockages.<br>" +
-                 "- Create raised planting ridges (1-meter wide) to let water drain naturally.<br>" +
-                 "- Cultivate high moisture tolerant crops like Rice, or deep root tubers like Cocoyam.";
-      } else if (texture === 'sandy') {
-        advice = "💡 <strong>Sandy Soil Advisory</strong>:<br>" +
-                 "- High leakage rate, nutrient washoff. Practice deep mulching with dry leaves or grasses.<br>" +
-                 "- Grow ground cover crops (e.g. Groundnuts/Cowpeas) to prevent solar heat evaporation.<br>" +
-                 "- Apply organic compost in small quantities frequently instead of all at once.";
-      } else {
-        advice = "💡 <strong>Loamy Soil Advisory</strong>:<br>" +
-                 "- Perfect soil balance. Keep organic content high by rotating maize with leguminous crops (beans).<br>" +
-                 "- Avoid chemical herbicide overloading. Practice minimal tillage to maintain root structure.";
-      }
-      
-      resultsText.innerHTML = advice;
-      resultsDiv.style.display = 'block';
-    }
-
-    // USSD Simulator State Machine Logic
-    let ussdSessionText = "";
-    let isUssdActive = false;
-
-    function pressKey(key) {
-      const inputDiv = document.getElementById('dialer-input');
-      if (inputDiv.textContent.length < 10) {
-        inputDiv.textContent += key;
-      }
-    }
-
-    function dialUSSD() {
-      const dialerInput = document.getElementById('dialer-input');
-      const code = dialerInput.textContent || "*384*55#";
-      
-      if (code === "*384*55#") {
-        isUssdActive = true;
-        ussdSessionText = "";
-        sendUssdRequest("");
-      } else {
-        alert("Invalid USSD code. Dial *384*55# for Seedorra services.");
-        dialerInput.textContent = "";
-      }
-    }
-
-    function sendUssdRequest(textInput) {
-      const phoneDisplay = document.getElementById('phone-display');
-      
-      fetch('/api/ussd', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: textInput,
-          phoneNumber: "08039281234",
-          languageCode: "<%= lang %>"
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        // Display result on phone screen
-        let screenHtml = `
-          <div class="ussd-alert-card">
-            <div class="ussd-alert-text">${data.response.replace(/\n/g, '<br>')}</div>
-        `;
-        
-        if (!data.isFinal) {
-          screenHtml += `
-            <input type="text" class="ussd-alert-input" id="ussd-input" autofocus placeholder="Type answer...">
-            <div class="ussd-alert-actions">
-              <button class="ussd-alert-btn" onclick="cancelUSSD()">Cancel</button>
-              <button class="ussd-alert-btn" onclick="submitUSSD()">Send</button>
-            </div>
-          `;
-        } else {
-          screenHtml += `
-            <div class="ussd-alert-actions">
-              <button class="ussd-alert-btn" onclick="cancelUSSD()">OK</button>
-            </div>
-          `;
-          
-          // If registration was successful, simulate receiving an SMS after 4 seconds
-          if (data.response.includes("Successful") || data.response.includes("Registration")) {
-            setTimeout(simulateMockSms, 4000);
-          }
-        }
-        
-        screenHtml += `</div>`;
-        phoneDisplay.innerHTML = screenHtml;
-        
-        // Auto-focus input
-        const ussdInput = document.getElementById('ussd-input');
-        if (ussdInput) {
-          ussdInput.focus();
-          // Allow enter key to submit
-          ussdInput.addEventListener("keyup", function(event) {
-            if (event.key === "Enter") {
-              submitUSSD();
+    function awardBadgeSilently(badgeName) {
+      if (loggedFarmer) {
+        if (!loggedFarmer.user.badges.includes(badgeName)) {
+          fetch('/api/profile/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone: loggedFarmer.user.phone,
+              name: loggedFarmer.user.name,
+              location: loggedFarmer.user.location,
+              size: loggedFarmer.user.size,
+              email: loggedFarmer.user.email || ""
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              fetchQueriesUpdate();
             }
           });
         }
-      });
-    }
-
-    function submitUSSD() {
-      const ussdInput = document.getElementById('ussd-input');
-      if (ussdInput) {
-        const val = ussdInput.value.trim();
-        if (val !== "") {
-          ussdSessionText = ussdSessionText === "" ? val : ussdSessionText + "*" + val;
-          sendUssdRequest(ussdSessionText);
-        }
       }
     }
 
-    function cancelUSSD() {
-      isUssdActive = false;
-      ussdSessionText = "";
-      const phoneDisplay = document.getElementById('phone-display');
+    // --- GATEWAY ORCHESTRATION ON STARTUP ---
+    window.addEventListener('DOMContentLoaded', () => {
+      const cached = localStorage.getItem('loggedFarmer');
       
-      // Restore dialer screen
-      phoneDisplay.innerHTML = `
-        <div class="phone-dialer" id="phone-dialer">
-          <div class="dialer-input" id="dialer-input"></div>
-          <div class="dialer-grid">
-            <button class="dial-btn" onclick="pressKey('1')">1</button>
-            <button class="dial-btn" onclick="pressKey('2')">2</button>
-            <button class="dial-btn" onclick="pressKey('3')">3</button>
-            <button class="dial-btn" onclick="pressKey('4')">4</button>
-            <button class="dial-btn" onclick="pressKey('5')">5</button>
-            <button class="dial-btn" onclick="pressKey('6')">6</button>
-            <button class="dial-btn" onclick="pressKey('7')">7</button>
-            <button class="dial-btn" onclick="pressKey('8')">8</button>
-            <button class="dial-btn" onclick="pressKey('9')">9</button>
-            <button class="dial-btn" onclick="pressKey('*')">*</button>
-            <button class="dial-btn" onclick="pressKey('0')">0</button>
-            <button class="dial-btn" onclick="pressKey('#')">#</button>
-            <button class="dial-btn dial-btn-call" onclick="dialUSSD()"><i class="fa-solid fa-phone"></i></button>
-          </div>
-        </div>
-      `;
-    }
-
-    // Simulate SMS alert reception on phone
-    function simulateMockSms() {
-      const inbox = document.getElementById('sms-inbox');
-      
-      let smsText = "";
-      if ("<%= lang %>" === 'yo') {
-        smsText = "Seedorra: Ikilo Oju-ojo! Ojo nla yoo rọ ni ọla. Daabobo awọn oko rẹ nipa fifọ awọn ikanni sísan omi. Idahun pẹlu *384*55# fun idiyele ọja tuntun.";
-      } else if ("<%= lang %>" === 'ha') {
-        smsText = "Seedorra: Gargaɗin Yanayi! Ana sa ran ruwan sama mai ƙarfi gobe. Ka kiyaye gonarka ta hanyar share magudanun ruwa. Kira *384*55# don duba farashin kasuwa.";
-      } else if ("<%= lang %>" === 'ig') {
-        smsText = "Seedorra: Ịdọ Aka ná Ntị! Oke mmiri ozuzo ga-azo echi. Hichaa ebe mmiri na-esi agbapụta. Kpọọ *384*55# ka ị mara ọnụ ahịa ihe ọkụkụ gị.";
-      } else if ("<%= lang %>" === 'pcm') {
-        smsText = "Seedorra: Weather Alert! Heavy rain go fall tomorrow. Clear drainage for your farm make ground no block water. Dial *384*55# to check market price.";
+      if (cached) {
+        // Authenticated user: unlock homepage and open dashboard
+        document.getElementById('main-homepage-content').style.display = 'block';
+        openFarmerDashboard();
       } else {
-        smsText = "Seedorra Alert: Heavy thunderstorm expected tomorrow. Clear all farm drainage to prevent crop flooding. Dial *384*55# for live market pricing.";
-      }
-
-      // Post message to backend sms log
-      fetch('/api/sms/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: "08039281234", message: smsText })
-      })
-      .then(res => res.json())
-      .then(data => {
-        // Display in UI
-        const timeStr = new Date().toLocaleTimeString();
-        const msgHtml = `
-          <div class="sms-message">
-            <div class="sms-sender"><i class="fa-solid fa-bell" style="margin-right: 4px;"></i> Seedorra Info</div>
-            <div class="sms-text">${smsText}</div>
-            <div class="sms-time">${timeStr}</div>
-          </div>
-        `;
-        
-        // Remove empty placeholder
-        if (inbox.textContent.includes("No messages")) {
-          inbox.innerHTML = "";
+        // Unauthenticated visitor: check if they need onboarding
+        const showOnboarding = <%= showOnboarding %>;
+        if (showOnboarding) {
+          document.getElementById('onboarding-overlay').style.display = 'flex';
+          startOnboardingTimer();
+        } else {
+          // Returning user who finished onboarding previously: display gateway login screen
+          document.getElementById('gateway-auth-overlay').style.display = 'flex';
+          switchGatewayTab('login');
         }
-        
-        inbox.innerHTML = msgHtml + inbox.innerHTML;
-      });
-    }
+      }
+    });
   </script>
 </body>
 </html>

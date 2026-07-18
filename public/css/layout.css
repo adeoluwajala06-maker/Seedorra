@@ -4,14 +4,14 @@
   --primary-color: #1A5718;
   --primary-hover: #113A10;
   --secondary-color: #56B259;
-  --accent-color: #8C62FF; /* Verbivy-inspired violet highlight */
+  --accent-color: #8C62FF;
   --bg-color: #F8F9FA;
   --surface-color: #FFFFFF;
   --text-main: #1A1A1A;
   --text-muted: #6C757D;
   --border-color: rgba(26, 87, 24, 0.08);
-  --border-radius-lg: 20px;
-  --border-radius-md: 12px;
+  --border-radius-lg: 24px;
+  --border-radius-md: 16px;
   --border-radius-sm: 8px;
   
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02);
@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5, h6 {
 header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 90;
   background-color: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -97,7 +97,7 @@ header {
 nav {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
 }
 
 nav a {
@@ -106,7 +106,6 @@ nav a {
   font-weight: 500;
   font-size: 15px;
   transition: var(--transition-smooth);
-  position: relative;
 }
 
 nav a:hover, nav a.active {
@@ -129,10 +128,6 @@ nav a:hover, nav a.active {
   cursor: pointer;
   outline: none;
   transition: var(--transition-smooth);
-}
-
-.lang-select:hover {
-  border-color: var(--primary-color);
 }
 
 /* Mobile Menu Button */
@@ -209,7 +204,6 @@ nav a:hover, nav a.active {
 .btn-primary:hover {
   background-color: var(--primary-color);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(26, 87, 24, 0.2);
 }
 
 .btn-secondary {
@@ -220,7 +214,6 @@ nav a:hover, nav a.active {
 
 .btn-secondary:hover {
   background-color: rgba(0, 0, 0, 0.03);
-  transform: translateY(-2px);
 }
 
 .btn-accent {
@@ -231,7 +224,6 @@ nav a:hover, nav a.active {
 .btn-accent:hover {
   background-color: #7240FF;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(140, 98, 255, 0.25);
 }
 
 /* Sections */
@@ -253,7 +245,6 @@ nav a:hover, nav a.active {
 .section-title {
   font-size: 36px;
   margin-bottom: 16px;
-  letter-spacing: -0.5px;
 }
 
 .section-desc {
@@ -295,7 +286,6 @@ nav a:hover, nav a.active {
 .weather-temp {
   font-size: 48px;
   font-weight: 800;
-  line-height: 1;
 }
 
 .weather-details {
@@ -314,7 +304,6 @@ nav a:hover, nav a.active {
 .weather-detail-label {
   font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 4px;
 }
 
 .weather-detail-val {
@@ -340,17 +329,13 @@ nav a:hover, nav a.active {
   gap: 8px;
 }
 
-.alert-message {
-  font-size: 14px;
-}
-
 .alert-severe {
   background: linear-gradient(135deg, #F8D7DA, #F5C6CB);
   border-left-color: #DC3545;
   color: #721C24;
 }
 
-/* Advisory Forms / Interactive Widgets */
+/* Advisory Forms */
 .tool-card {
   background-color: var(--surface-color);
   border-radius: var(--border-radius-lg);
@@ -358,11 +343,6 @@ nav a:hover, nav a.active {
   box-shadow: var(--shadow-md);
   padding: 32px;
   transition: var(--transition-smooth);
-}
-
-.tool-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
 }
 
 .form-group {
@@ -408,10 +388,6 @@ nav a:hover, nav a.active {
   margin-bottom: 10px;
 }
 
-.results-content {
-  font-size: 15px;
-}
-
 /* Commodity Prices Section */
 .prices-wrapper {
   overflow-x: auto;
@@ -425,7 +401,6 @@ nav a:hover, nav a.active {
 .price-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
 }
 
 .price-table th, .price-table td {
@@ -433,19 +408,13 @@ nav a:hover, nav a.active {
 }
 
 .price-table th {
-  font-family: var(--font-heading);
-  font-weight: 700;
   border-bottom: 2px solid var(--border-color);
   color: var(--text-muted);
+  text-align: left;
 }
 
 .price-table td {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  font-size: 15px;
-}
-
-.price-table tr:last-child td {
-  border-bottom: none;
 }
 
 .trend-badge {
@@ -493,26 +462,11 @@ nav a:hover, nav a.active {
   background-color: #1a1a1a;
   border-radius: 44px;
   padding: 12px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15),
-              inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   position: relative;
   border: 4px solid #333333;
-}
-
-.phone-chassis::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 140px;
-  height: 30px;
-  background-color: #1a1a1a;
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
-  z-index: 5;
 }
 
 .phone-screen {
@@ -523,7 +477,6 @@ nav a:hover, nav a.active {
   display: flex;
   flex-direction: column;
   color: #fff;
-  font-family: var(--font-body);
   position: relative;
 }
 
@@ -534,12 +487,6 @@ nav a:hover, nav a.active {
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
-  font-weight: 600;
-}
-
-.phone-status-right {
-  display: flex;
-  gap: 6px;
 }
 
 .phone-display {
@@ -552,7 +499,6 @@ nav a:hover, nav a.active {
   background-color: #121212;
 }
 
-/* USSD Screen UI */
 .ussd-alert-card {
   width: 100%;
   background-color: #FFFFFF;
@@ -563,18 +509,6 @@ nav a:hover, nav a.active {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.ussd-alert-text {
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-line;
 }
 
 .ussd-alert-input {
@@ -582,7 +516,6 @@ nav a:hover, nav a.active {
   border: none;
   border-bottom: 1px solid #CCCCCC;
   padding: 8px 0;
-  font-family: var(--font-body);
   font-size: 15px;
   outline: none;
   background-color: transparent;
@@ -597,15 +530,11 @@ nav a:hover, nav a.active {
 .ussd-alert-btn {
   background: none;
   border: none;
-  color: #007AFF; /* Apple blue */
-  font-family: var(--font-body);
+  color: #007AFF;
   font-weight: 600;
-  font-size: 15px;
   cursor: pointer;
-  padding: 4px 8px;
 }
 
-/* Home Screen / Dial State */
 .phone-dialer {
   display: flex;
   flex-direction: column;
@@ -620,7 +549,6 @@ nav a:hover, nav a.active {
   text-align: center;
   font-size: 32px;
   font-weight: 700;
-  letter-spacing: 1px;
   color: #fff;
   min-height: 48px;
 }
@@ -640,28 +568,17 @@ nav a:hover, nav a.active {
   border: none;
   color: #fff;
   font-size: 20px;
-  font-weight: 600;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: var(--transition-smooth);
-}
-
-.dial-btn:active {
-  background-color: #404040;
 }
 
 .dial-btn-call {
-  background-color: #30D158; /* Apple Green */
+  background-color: #30D158;
   grid-column: 2;
 }
 
-.dial-btn-call:active {
-  background-color: #249D42;
-}
-
-/* SMS Alert Notification Box */
 .phone-sms-box {
   width: 100%;
   margin-top: 24px;
@@ -685,235 +602,581 @@ nav a:hover, nav a.active {
   border-radius: var(--border-radius-md);
   padding: 12px 16px;
   border-left: 4px solid var(--accent-color);
-  animation: slideInRight 0.3s ease;
-}
-
-@keyframes slideInRight {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
 }
 
 .sms-sender {
   font-weight: 700;
   font-size: 12px;
   color: var(--accent-color);
-  margin-bottom: 4px;
-}
-
-.sms-text {
-  font-size: 13.5px;
 }
 
 .sms-time {
   font-size: 10px;
   color: var(--text-muted);
   text-align: right;
-  margin-top: 4px;
 }
 
-/* Admin Dashboard layout styles */
-.admin-grid {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 40px;
-  margin-top: 40px;
+/* --- Interactive Onboarding Flow Modal --- */
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.admin-sidebar {
+.onboarding-viewport {
+  width: 100%;
+  height: 100%;
+  background-color: #EAE6F8;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+}
+
+.onboarding-slides {
+  display: flex;
+  width: 500%;
+  height: 100%;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.onboarding-slide {
+  width: 20%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.slide-image-section {
+  flex-grow: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.slide-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+}
+
+.onboarding-skip-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.onboarding-card {
   background-color: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  padding: 24px;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 15;
+}
+
+.onboarding-dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.onboarding-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(140, 98, 255, 0.2);
+  transition: var(--transition-smooth);
+}
+
+.onboarding-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background-color: var(--accent-color);
+}
+
+.onboarding-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.onboarding-desc {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.onboarding-btn-row {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.admin-menu-link {
-  display: block;
-  padding: 12px 16px;
-  border-radius: var(--border-radius-sm);
-  color: var(--text-main);
-  text-decoration: none;
-  font-weight: 600;
+/* Onboarding responsive adaptations for Desktop & Tablet */
+@media (min-width: 768px) {
+  .onboarding-viewport {
+    width: 90%;
+    max-width: 860px;
+    height: 90%;
+    max-height: 540px;
+    border-radius: 24px;
+    border: 12px solid #222;
+    box-shadow: var(--shadow-lg);
+  }
+  .onboarding-slide {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .slide-image-section {
+    width: 50%;
+    height: 100%;
+    flex-grow: 0;
+  }
+  .onboarding-card {
+    width: 50%;
+    height: 100%;
+    border-radius: 0;
+    justify-content: center;
+    padding: 48px;
+  }
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
   transition: var(--transition-smooth);
 }
 
-.admin-menu-link.active, .admin-menu-link:hover {
-  background-color: rgba(26, 87, 24, 0.08);
-  color: var(--primary-color);
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-.admin-content {
+.modal-card {
+  width: 90%;
+  max-width: 480px;
   background-color: var(--surface-color);
-  border: 1px solid var(--border-color);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: 40px;
+  padding: 32px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  transform: translateY(20px);
+  transition: var(--transition-smooth);
+  position: relative;
 }
 
-.admin-section {
-  display: none;
+.modal-overlay.active .modal-card {
+  transform: translateY(0);
 }
 
-.admin-section.active {
-  display: block;
+.modal-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-muted);
 }
 
-.admin-form-group {
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
-  padding-bottom: 20px;
-}
-
-.admin-form-group:last-child {
-  border-bottom: none;
-}
-
-.admin-form-group label {
-  display: block;
-  font-weight: 700;
-  font-size: 15px;
+.modal-title {
+  font-size: 26px;
   margin-bottom: 8px;
-  color: var(--primary-color);
 }
 
-.admin-form-group textarea {
-  width: 100%;
-  height: 80px;
-  padding: 12px;
-  border-radius: var(--border-radius-md);
-  border: 1px solid #CCC;
-  font-family: var(--font-body);
+.modal-desc {
   font-size: 14px;
-  resize: vertical;
-  outline: none;
-}
-
-.admin-form-group textarea:focus {
-  border-color: var(--primary-color);
-}
-
-.admin-alert {
-  padding: 16px;
-  border-radius: var(--border-radius-md);
+  color: var(--text-muted);
   margin-bottom: 24px;
 }
 
-.admin-alert-success {
-  background-color: #D4EDDA;
-  color: #155724;
-  border: 1px solid #C3E6CB;
-}
-
-/* Footer */
-footer {
-  background-color: var(--text-main);
-  color: rgba(255, 255, 255, 0.6);
-  padding: 60px 0;
-  font-size: 14px;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
-}
-
-.footer-logo {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 24px;
-  color: #fff;
-  margin-bottom: 16px;
+.success-check-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(86, 178, 89, 0.1);
+  color: var(--secondary-color);
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 20px auto;
 }
 
-.footer-link-group h4 {
-  color: #fff;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-
-.footer-link-group ul {
-  list-style: none;
-}
-
-.footer-link-group ul li {
-  margin-bottom: 12px;
-}
-
-.footer-link-group ul li a {
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
+/* --- Farmer Dashboard Overlay Portal --- */
+.farmer-dashboard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
   transition: var(--transition-smooth);
 }
 
-.footer-link-group ul li a:hover {
-  color: #fff;
+.farmer-dashboard-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 24px;
+.farmer-dashboard-card {
+  width: 95%;
+  max-width: 960px;
+  height: 90%;
+  max-height: 800px;
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+/* Tabs & Sidebar layouts for dashboard */
+.fd-header {
+  padding: 24px 32px;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+}
+
+.fd-nav-tabs {
+  display: flex;
+  background-color: rgba(0,0,0,0.03);
+  padding: 4px;
+  border-radius: 30px;
+  gap: 4px;
+  list-style: none;
+}
+
+.fd-tab-item button {
+  background: none;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  color: var(--text-muted);
+}
+
+.fd-tab-item.active button, .fd-tab-item button:hover {
+  background-color: var(--surface-color);
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.fd-body {
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.fd-panel {
+  display: none;
+}
+
+.fd-panel.active {
+  display: block;
+}
+
+/* Live News Photo Slider Session */
+.news-slider-container {
+  position: relative;
+  height: 240px;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+.news-slides {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.news-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  display: flex;
+  align-items: flex-end;
+}
+
+.news-slide.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.news-caption-overlay {
+  width: 100%;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+  padding: 24px;
+  color: #fff;
+}
+
+/* Profile photo upload component */
+.profile-avatar-uploader {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--secondary-color);
+  cursor: pointer;
+  margin: 0 auto 16px auto;
+}
+
+.profile-avatar-uploader img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.profile-avatar-uploader:hover .profile-avatar-hover {
+  opacity: 1;
+}
+
+/* Badges section */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 16px;
+  margin-bottom: 24px;
+}
+
+.badge-card {
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  opacity: 0.4;
+  transition: var(--transition-smooth);
+}
+
+.badge-card.unlocked {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(86,178,89,0.06), rgba(140,98,255,0.06));
+  border-color: rgba(140,98,255,0.2);
+}
+
+.badge-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+/* Diagnosis Plant styles */
+.diag-upload-zone {
+  border: 2px dashed rgba(140,98,255,0.3);
+  background-color: rgba(140,98,255,0.02);
+  border-radius: var(--border-radius-md);
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  margin-bottom: 20px;
+}
+
+.diag-upload-zone:hover {
+  border-color: var(--accent-color);
+  background-color: rgba(140,98,255,0.05);
+}
+
+.diag-progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #EEE;
+  border-radius: 4px;
+  overflow: hidden;
+  display: none;
+  margin-bottom: 20px;
+}
+
+.diag-progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: var(--accent-color);
+  transition: width 0.1s linear;
+}
+
+.diag-results-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.diag-image-box {
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  text-align: center;
+}
+
+.diag-image-box img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+}
+
+/* Pest warning cards */
+.pest-warning-card {
+  border: 1px solid var(--border-color);
+  border-left: 6px solid #DC3545;
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  background-color: var(--surface-color);
+  margin-bottom: 16px;
+}
+
+.pest-warning-card.extreme {
+  border-left-color: #721C24;
+  background-color: #FDF3F4;
+}
+
+.password-field-wrapper {
+  position: relative;
+}
+
+.password-toggle-eye {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+/* History logs list */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 3px solid var(--text-muted);
 }
 
 /* Responsive Adaptation Breakpoints */
-
-/* Tablet adaptation (max-width: 1024px) */
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 32px;
   }
-  
   .hero-subtitle {
     margin-left: auto;
     margin-right: auto;
   }
-  
   .hero-actions {
     justify-content: center;
   }
-  
   .tools-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
   }
-  
   .ussd-section-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
   }
-  
   .phone-container {
     order: 2;
   }
-  
-  .admin-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
-/* Mobile adaptation (max-width: 768px) */
 @media (max-width: 768px) {
   .nav-wrapper {
     height: 70px;
   }
-  
   nav {
-    display: none; /* In a real app we'd toggle menu; we'll show lang-selector and hide other nav links */
+    display: none;
   }
-  
   nav.mobile-active {
     display: flex;
     flex-direction: column;
@@ -926,56 +1189,15 @@ footer {
     box-shadow: var(--shadow-md);
     border-bottom: 1px solid var(--border-color);
     gap: 16px;
+    z-index: 100;
   }
-  
   .mobile-menu-toggle {
     display: block;
   }
-  
-  .hero-title {
-    font-size: 36px;
-    letter-spacing: -1px;
+  .farmer-dashboard-card {
+    height: 95%;
   }
-  
-  .hero-subtitle {
-    font-size: 16px;
-  }
-  
-  .section {
-    padding: 60px 0;
-  }
-  
-  .section-title {
-    font-size: 28px;
-  }
-  
-  .price-table th, .price-table td {
-    padding: 12px 14px;
-    font-size: 14px;
-  }
-  
-  .footer-grid {
+  .diag-results-split {
     grid-template-columns: 1fr;
-    gap: 32px;
-  }
-}
-
-/* Small mobile adaptation (max-width: 480px) */
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 30px;
-  }
-  
-  .btn {
-    width: 100%;
-  }
-  
-  .price-table th:nth-child(4), .price-table td:nth-child(4) {
-    display: none; /* Hide previous price column on small mobile screens */
-  }
-  
-  .price-table th, .price-table td {
-    padding: 8px 10px;
-    font-size: 13px;
   }
 }

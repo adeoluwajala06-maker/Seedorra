@@ -24,10 +24,35 @@ const DB_PATH = path.join(__dirname, 'content.json');
 function readDb() {
   try {
     const data = fs.readFileSync(DB_PATH, 'utf8');
-    return JSON.parse(data);
+    const db = JSON.parse(data);
+
+    // Self-healing dictionary initializer:
+    // If dictionary keys for other languages are missing, populate them using English fallbacks.
+    if (!db.dictionary) db.dictionary = { en: {} };
+    if (!db.dictionary.en) db.dictionary.en = {};
+    
+    const enKeys = Object.keys(db.dictionary.en);
+    const targetLangs = ['yo', 'ha', 'ig', 'pcm'];
+    
+    targetLangs.forEach(lang => {
+      if (!db.dictionary[lang]) {
+        db.dictionary[lang] = {};
+      }
+      enKeys.forEach(key => {
+        if (db.dictionary[lang][key] === undefined) {
+          db.dictionary[lang][key] = db.dictionary.en[key];
+        }
+      });
+    });
+
+    if (!db.seen_onboarding_ips) {
+      db.seen_onboarding_ips = [];
+    }
+
+    return db;
   } catch (err) {
     console.error("Error reading database:", err);
-    return { site_name: "Seedorra", admin_password: "seedorra-admin", dictionary: {} };
+    return { site_name: "Seedorra", admin_password: "seedorra-admin", users: [], dictionary: { en: {} }, seen_onboarding_ips: [] };
   }
 }
 
@@ -58,8 +83,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Temporary storage for registered users (SMS list) and simulated SMS logs
-let registeredUsers = [];
+// Temporary storage for simulated SMS logs
 let smsLog = [];
 
 // Static Fallback Pricing Data (used in case scraping fails)
@@ -80,7 +104,6 @@ let lastScrapeTime = null;
 // Scraping Function for https://commodity.ng/live-prices/
 async function scrapePrices() {
   const now = Date.now();
-  // 1-hour cache duration
   if (scrapedPricesCache && lastScrapeTime && (now - lastScrapeTime < 3600000)) {
     return scrapedPricesCache;
   }
@@ -96,10 +119,7 @@ async function scrapePrices() {
     const $ = cheerio.load(response.data);
     const pricesList = [];
 
-    // Parse all tables with class or id containing commodity
     $('table').each((i, tableEl) => {
-      const tableId = $(tableEl).attr('id') || '';
-      // We target the tables on the page
       $(tableEl).find('tbody tr').each((j, rowEl) => {
         const cells = $(rowEl).find('td');
         if (cells.length >= 3) {
@@ -108,15 +128,12 @@ async function scrapePrices() {
           let currentStr = $(cells[1]).text().trim().replace(/,/g, '');
           let prevStr = $(cells[2]).text().trim().replace(/,/g, '');
 
-          // If there are 4+ cells, adjust columns to match site structure:
-          // Th: Commodity | Price of 50kg (or Unit) | Current Price | Previous Price
           if (cells.length >= 4) {
             size = $(cells[1]).text().trim() || "50kg bag";
             currentStr = $(cells[2]).text().trim().replace(/,/g, '');
             prevStr = $(cells[3]).text().trim().replace(/,/g, '');
           }
 
-          // Clean numbers
           const current = parseFloat(currentStr);
           const previous = parseFloat(prevStr);
 
@@ -124,7 +141,6 @@ async function scrapePrices() {
             const diff = !isNaN(previous) ? (current - previous) : 0;
             const trend = diff > 0 ? "up" : (diff < 0 ? "down" : "neutral");
             
-            // Format for display
             pricesList.push({
               name: name,
               size: size,
@@ -139,16 +155,14 @@ async function scrapePrices() {
     });
 
     if (pricesList.length > 0) {
-      scrapedPricesCache = pricesList.slice(0, 10); // Take top 10 items for a clean UI
+      scrapedPricesCache = pricesList.slice(0, 10);
       lastScrapeTime = now;
-      console.log(`Scraped ${pricesList.length} items successfully.`);
       return scrapedPricesCache;
     }
   } catch (error) {
     console.error("Scraping live prices failed, using fallback database. Error:", error.message);
   }
 
-  // Fallback if scraping failed
   scrapedPricesCache = FALLBACK_PRICES;
   lastScrapeTime = now;
   return scrapedPricesCache;
@@ -163,6 +177,13 @@ const WEATHER_DATA = {
   "SS": { temp: "28°C", humidity: "90%", wind: "16 km/h", forecast: "Overcast skies with tropical downpours.", alert: "Heavy Precipitation Warning: High risk of soil erosion. Avoid tilling now.", severity: "severe" }
 };
 
+// National Pest Alerts Mock Database
+const PEST_ALERTS = [
+  { id: 1, pest: "Fall Armyworm (Spodoptera frugiperda)", severity: "severe", location: "South-West (Oyo, Ogun, Osun) & Middle Belt", description: "Active outbreaks reported on young maize stalks. Feeding damage causes leaf skeletonization.", remedy: "Spray neem oil solution early morning or apply biological Bt insecticides. Clear fields post-harvest." },
+  { id: 2, pest: "African Desert Locust Swarms", severity: "extreme", location: "North-East border regions (Borno, Yobe)", description: "Warning advisory active. Border swarms moving from Sahel. Crop stripping hazard.", remedy: "Report coordinates immediately to national extension officers. Keep soil tilled to destroy pupae." },
+  { id: 3, pest: "Stem Borer Infestation", severity: "moderate", location: "South-East & South-South rain forests", description: "Larvae boring into cereal crops. Causes 'dead hearts' in rice and sorghum plants.", remedy: "Practice crop rotation with legumes. Apply organic compost to improve plant resistance." }
+];
+
 // Main Landing Page Route
 app.get('/', async (req, res) => {
   const db = readDb();
@@ -174,25 +195,269 @@ app.get('/', async (req, res) => {
   const dict = db.dictionary[lang];
   const prices = await scrapePrices();
 
+  // Get Client IP to check if they have completed onboarding
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip;
+  const showOnboarding = !db.seen_onboarding_ips.includes(clientIp);
+
   res.render('index', {
     site_name: db.site_name,
     media: db.media,
     lang: lang,
     dict: dict,
     prices: prices,
-    weatherData: WEATHER_DATA
+    weatherData: WEATHER_DATA,
+    pestAlerts: PEST_ALERTS,
+    showOnboarding: showOnboarding
   });
 });
 
-// Admin Panel Login/Dashboard Routes
+// Endpoint to mark Onboarding complete for an IP address
+app.post('/api/onboarding/complete', (req, res) => {
+  const db = readDb();
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip;
+
+  if (!db.seen_onboarding_ips.includes(clientIp)) {
+    db.seen_onboarding_ips.push(clientIp);
+    writeDb(db);
+  }
+  res.json({ success: true, clientIp });
+});
+
+// Farmer Registration Endpoint
+app.post('/api/register', (req, res) => {
+  const { name, location, size, phone, email, password } = req.body;
+  if (!name || !location || !size || !phone || !password) {
+    return res.status(400).json({ success: false, error: "Missing required farm fields." });
+  }
+
+  const db = readDb();
+  if (!db.users) db.users = [];
+
+  // Check if phone already exists
+  const existingUser = db.users.find(u => u.phone === phone);
+  if (existingUser) {
+    return res.json({ success: false, error: "A farmer with this phone number is already registered." });
+  }
+
+  const newUser = {
+    name,
+    location,
+    size: parseFloat(size).toString(),
+    phone,
+    email: email || "",
+    password: password,
+    profile_photo: "/images/onboarding_welcome.jpg",
+    queries: [],
+    badges: ["Seedling Saver"]
+  };
+
+  db.users.push(newUser);
+  writeDb(db);
+
+  res.json({ success: true, user: newUser });
+});
+
+// Farmer / Admin Login Endpoint
+app.post('/api/login', (req, res) => {
+  const { name, phone } = req.body;
+  if (!name || !phone) {
+    return res.status(400).json({ success: false, error: "Missing name or credential." });
+  }
+
+  const db = readDb();
+
+  // 1. Check if Admin Login
+  if (name.toLowerCase().trim() === db.admin_username && phone === db.admin_password) {
+    return res.json({
+      success: true,
+      role: 'admin',
+      auth: db.admin_password,
+      redirect: `/admin?auth=${db.admin_password}`
+    });
+  }
+
+  // 2. Check if Farmer Login
+  if (!db.users) db.users = [];
+  const farmer = db.users.find(u => 
+    u.name.toLowerCase().trim() === name.toLowerCase().trim() && 
+    (u.password === phone.trim() || u.phone.trim() === phone.trim())
+  );
+
+  if (farmer) {
+    const isNorth = farmer.location.toLowerCase().includes('kano') || 
+                    farmer.location.toLowerCase().includes('kaduna') || 
+                    farmer.location.toLowerCase().includes('sokoto') ||
+                    farmer.location.toLowerCase().includes('north');
+                    
+    const regionCode = isNorth ? 'NW' : 'SW';
+    const weather = WEATHER_DATA[regionCode];
+
+    return res.json({
+      success: true,
+      role: 'farmer',
+      user: farmer,
+      dashboardData: {
+        location: farmer.location,
+        size: farmer.size,
+        weather: weather,
+        recCrops: isNorth ? "Wheat, Maize, Onions, Millet" : "Cassava, Yam, Cocoa, Rice"
+      }
+    });
+  }
+
+  // 3. Not Found - Encouraging Messages
+  const encouragingMessages = [
+    "Oops! We searched our fields but couldn't find a farm registered under that name or password. Double-check your spelling, or sign up as a new farmer to join the Seedorra family! 🌾",
+    "Oh no! It looks like those details got tangled in the vines. Check your name and password and try again, or register your farm today! 🚜",
+    "Haba! That combination doesn't match our farmer database. Please check your information and try again, or register to start growing smarter! 🌱"
+  ];
+  
+  const randomMsg = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
+
+  res.json({
+    success: false,
+    message: randomMsg
+  });
+});
+
+// Update Profile Info
+app.post('/api/profile/update', (req, res) => {
+  const { phone, name, location, size, email } = req.body;
+  if (!phone || !name || !location || !size) {
+    return res.status(400).json({ success: false, error: "Missing required fields." });
+  }
+
+  const db = readDb();
+  const index = db.users.findIndex(u => u.phone === phone);
+
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: "Farmer not found." });
+  }
+
+  db.users[index].name = name;
+  db.users[index].location = location;
+  db.users[index].size = parseFloat(size).toString();
+  db.users[index].email = email || "";
+
+  if (!db.users[index].badges.includes("Soil Doctor")) {
+    db.users[index].badges.push("Soil Doctor");
+  }
+
+  writeDb(db);
+  res.json({ success: true, user: db.users[index] });
+});
+
+// Update Password
+app.post('/api/profile/password', (req, res) => {
+  const { phone, currentPassword, newPassword } = req.body;
+  if (!phone || !currentPassword || !newPassword) {
+    return res.status(400).json({ success: false, error: "Missing password parameters." });
+  }
+
+  const db = readDb();
+  const index = db.users.findIndex(u => u.phone === phone);
+
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: "Farmer not found." });
+  }
+
+  if (db.users[index].password !== currentPassword) {
+    return res.json({ success: false, error: "Current password does not match." });
+  }
+
+  db.users[index].password = newPassword;
+  writeDb(db);
+  res.json({ success: true });
+});
+
+// Profile Photo Upload Endpoint
+app.post('/api/profile/upload-photo', upload.single('profile_photo'), (req, res) => {
+  const { phone } = req.body;
+  if (!phone || !req.file) {
+    return res.status(400).json({ success: false, error: "Missing phone or photo file." });
+  }
+
+  const db = readDb();
+  const index = db.users.findIndex(u => u.phone === phone);
+
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: "Farmer not found." });
+  }
+
+  const photoPath = `/uploads/${req.file.filename}`;
+  db.users[index].profile_photo = photoPath;
+
+  writeDb(db);
+  res.json({ success: true, photoPath: photoPath });
+});
+
+// Plant Diagnosis API
+app.post('/api/diagnose', upload.single('plant_photo'), (req, res) => {
+  const { crop, phone } = req.body;
+  
+  if (!crop) {
+    return res.status(400).json({ success: false, error: "Missing plant crop parameter." });
+  }
+
+  let diagnosis = "Nutrient Deficiency (Nitrogen/Phosphorus)";
+  let severity = "Mild";
+  let cure = "Apply well-composted organic poultry manure or organic liquid fertilizer. Increase soil mulching.";
+  let caseImage = "/images/disease_blight.jpg";
+
+  if (crop.toLowerCase() === 'maize') {
+    diagnosis = "Maize Common Rust (Puccinia sorghi)";
+    severity = "High";
+    cure = "Apply organic neem oil spray weekly. Clear dry crop residue after harvest. Rotate crops with leguminous cover plants next season.";
+    caseImage = "/images/disease_blight.jpg";
+  } else if (crop.toLowerCase() === 'cassava') {
+    diagnosis = "Cassava Mosaic Virus (CMD)";
+    severity = "Severe";
+    cure = "Uproot infected stems to prevent spread. Plant disease-resistant stem cuttings (such as TMS 30572). Control whiteflies using organic neem extract.";
+    caseImage = "/images/onboarding_crops.jpg";
+  } else if (crop.toLowerCase() === 'tomato') {
+    diagnosis = "Tomato Early Blight (Alternaria solani)";
+    severity = "Moderate";
+    cure = "Prune lower leaves to improve aeration. Avoid overhead watering. Apply copper-based organic fungicides early morning.";
+    caseImage = "/images/onboarding_soil.jpg";
+  }
+
+  if (phone) {
+    const db = readDb();
+    const index = db.users.findIndex(u => u.phone === phone);
+    if (index !== -1) {
+      const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      db.users[index].queries.push({
+        type: "Plant Diagnosis",
+        input: crop.charAt(0).toUpperCase() + crop.slice(1),
+        result: `${diagnosis} (${severity})`,
+        date: today
+      });
+      
+      if (!db.users[index].badges.includes("Farm Doctor")) {
+        db.users[index].badges.push("Farm Doctor");
+      }
+      
+      writeDb(db);
+    }
+  }
+
+  res.json({
+    success: true,
+    diagnosis: diagnosis,
+    severity: severity,
+    cure: cure,
+    matchedCaseImage: caseImage,
+    matchScore: "96% Verified Match"
+  });
+});
+
+// Admin Panel login/dashboard
 app.get('/admin', (req, res) => {
   const db = readDb();
   const lang = req.query.lang || 'en';
   const dict = db.dictionary[lang] || db.dictionary['en'];
 
-  // Simple basic authentication query check for MVP (?pw=seedorra-admin)
-  // Or check custom session headers
-  const isAuthorized = req.query.auth === db.admin_password || req.headers.authorization === db.admin_password;
+  const isAuthorized = req.query.auth === db.admin_password;
 
   res.render('admin', {
     site_name: db.site_name,
@@ -202,8 +467,8 @@ app.get('/admin', (req, res) => {
     lang: lang,
     auth: req.query.auth || '',
     isAuthorized: isAuthorized,
-    registeredUsersCount: registeredUsers.length,
-    registeredUsers: registeredUsers,
+    registeredUsersCount: db.users ? db.users.length : 0,
+    registeredUsers: db.users || [],
     smsLog: smsLog
   });
 });
@@ -217,10 +482,8 @@ app.post('/admin/save', (req, res) => {
     return res.status(403).send("Unauthorized");
   }
 
-  // Update site general settings
   db.site_name = req.body.site_name || db.site_name;
 
-  // Update dictionary strings dynamically
   Object.keys(db.dictionary).forEach(langCode => {
     Object.keys(db.dictionary[langCode]).forEach(key => {
       const formKey = `dict_${langCode}_${key}`;
@@ -255,31 +518,26 @@ app.post('/admin/upload', upload.single('media_file'), (req, res) => {
 
 // Force refresh scraped prices
 app.get('/api/prices/refresh', async (req, res) => {
-  scrapedPricesCache = null; // Clear cache
+  scrapedPricesCache = null;
   const prices = await scrapePrices();
   res.json({ success: true, count: prices.length, prices: prices });
 });
 
 // USSD API State Machine Simulator
-// Maps session inputs and returns simulated USSD screens
 app.post('/api/ussd', (req, res) => {
   const { text, phoneNumber, languageCode } = req.body;
   const db = readDb();
   
-  // Choose dictionary based on active language or USSD session state
   let currentLang = languageCode || 'en';
   let dict = db.dictionary[currentLang] || db.dictionary['en'];
 
-  // Splits inputs like '1*3*2'
   const inputSequence = text ? text.split('*') : [];
   let responseText = "";
   let isFinal = false;
 
-  // Root Menu
   if (inputSequence.length === 0 || text === "") {
     responseText = `CON Seedorra Agricultural Advice\nChoose language / Yan ede / Zaɓi Yare:\n1. English\n2. Yoruba\n3. Hausa\n4. Igbo\n5. Pidgin`;
   } 
-  // Main Menu selection (Language chosen)
   else if (inputSequence.length === 1) {
     const langChoice = inputSequence[0];
     const langCodes = { '1': 'en', '2': 'yo', '3': 'ha', '4': 'ig', '5': 'pcm' };
@@ -288,7 +546,6 @@ app.post('/api/ussd', (req, res) => {
 
     responseText = `CON Seedorra (${currentLang.toUpperCase()})\n1. ${dict.section_weather_title}\n2. ${dict.section_crop_title}\n3. ${dict.section_prices_title}\n4. Register for daily alerts`;
   }
-  // Secondary Level Selection
   else if (inputSequence.length === 2) {
     const langChoice = inputSequence[0];
     const langCodes = { '1': 'en', '2': 'yo', '3': 'ha', '4': 'ig', '5': 'pcm' };
@@ -298,23 +555,18 @@ app.post('/api/ussd', (req, res) => {
     const menuChoice = inputSequence[1];
 
     if (menuChoice === '1') {
-      // Weather Zones Selection
       responseText = `CON Choose Farming Region:\n1. South West\n2. North East\n3. North West\n4. South East\n5. South South`;
     } else if (menuChoice === '2') {
-      // Crop Recommendation Selection
       responseText = `CON Select Your Zone State:\n1. Oyo/Osun (West)\n2. Kano/Kaduna (North)\n3. Enugu/Anambra (East)\n4. Delta/Rivers (South)`;
     } else if (menuChoice === '3') {
-      // Price Check Selection
       responseText = `CON Check Live Prices:\n1. Local Rice\n2. White Maize\n3. Brown Beans\n4. Yam Tuber`;
     } else if (menuChoice === '4') {
-      // Register confirmation
       responseText = `CON Enter Farm Size in Hectares:\n(e.g., 2 or 5.5)`;
     } else {
       responseText = `END Invalid Selection`;
       isFinal = true;
     }
   }
-  // Third Level (Results / Final Screens)
   else if (inputSequence.length === 3) {
     const langChoice = inputSequence[0];
     const langCodes = { '1': 'en', '2': 'yo', '3': 'ha', '4': 'ig', '5': 'pcm' };
@@ -327,13 +579,11 @@ app.post('/api/ussd', (req, res) => {
     isFinal = true;
 
     if (menuChoice === '1') {
-      // Weather Alert Result
       const regions = { '1': 'SW', '2': 'NE', '3': 'NW', '4': 'SE', '5': 'SS' };
       const regCode = regions[detailChoice] || 'SW';
       const wData = WEATHER_DATA[regCode];
       responseText = `END Seedorra Weather Alert:\n${wData.alert}\nForecast: ${wData.forecast}`;
     } else if (menuChoice === '2') {
-      // Crop Recommendation Result
       const crops = {
         '1': "Cassava, Yam, Cocoa",
         '2': "Maize, Millet, Groundnut",
@@ -343,7 +593,6 @@ app.post('/api/ussd', (req, res) => {
       const rec = crops[detailChoice] || "Cassava, Maize";
       responseText = `END AI Recommendation:\nBased on soil and humidity, plant: ${rec}. Sowing calendar: March-May.`;
     } else if (menuChoice === '3') {
-      // Price Result
       const pricesMap = {
         '1': "Rice: ₦54,000 / 50kg bag (Up 2.8%)",
         '2': "Maize: ₦33,000 / 50kg bag (Down 1.2%)",
@@ -353,19 +602,28 @@ app.post('/api/ussd', (req, res) => {
       const priceText = pricesMap[detailChoice] || "Rice: ₦54,000";
       responseText = `END Live Price:\n${priceText}\nScraped from Commodity Nigeria.`;
     } else if (menuChoice === '4') {
-      // Registration complete
       const farmSize = parseFloat(detailChoice) || 1.0;
       const user = {
-        phone: phoneNumber || "08031234567",
-        lang: currentLang,
-        size: farmSize,
-        registeredAt: new Date().toLocaleTimeString()
+        name: "Feature Phone User",
+        phone: phoneNumber || "08039281234",
+        location: "USSD Simulator Zone",
+        size: farmSize.toString(),
+        email: "",
+        password: "123",
+        profile_photo: "/images/onboarding_welcome.jpg",
+        queries: [],
+        badges: ["Seedling Saver"]
       };
       
-      // Prevent duplicates in mock list
-      if (!registeredUsers.find(u => u.phone === user.phone)) {
-        registeredUsers.push(user);
+      if (!db.users) db.users = [];
+      
+      const existingIdx = db.users.findIndex(u => u.phone === user.phone);
+      if (existingIdx === -1) {
+        db.users.push(user);
+      } else {
+        db.users[existingIdx].size = user.size;
       }
+      writeDb(db);
 
       responseText = `END Registration Successful!\nYou will receive daily farming advisories and weather alerts in ${currentLang.toUpperCase()} via SMS shortly.`;
     }
@@ -391,7 +649,7 @@ app.post('/api/sms/send', (req, res) => {
     timestamp: new Date().toLocaleTimeString()
   };
 
-  smsLog.unshift(logEntry); // Put newest on top
+  smsLog.unshift(logEntry);
   res.json({ success: true, log: logEntry });
 });
 

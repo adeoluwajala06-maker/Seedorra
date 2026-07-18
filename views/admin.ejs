@@ -20,6 +20,17 @@
       font-weight: 600;
       color: var(--text-main);
     }
+    .admin-grid-three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    @media (max-width: 1200px) {
+      .admin-grid-three-col {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body style="background-color: var(--bg-color);">
@@ -67,7 +78,7 @@
           <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-ig')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Igbo Copy</a>
           <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-pcm')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Pidgin Copy</a>
           <a href="#" class="admin-menu-link" onclick="switchTab(event, 'media-tab')"><i class="fa-solid fa-images" style="margin-right: 10px; width: 16px;"></i>Media Files</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'campaign-tab')"><i class="fa-solid fa-tower-cell" style="margin-right: 10px; width: 16px;"></i>Registered Users & Logs</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'campaign-tab')"><i class="fa-solid fa-tower-cell" style="margin-right: 10px; width: 16px;"></i>USSD Simulator & Logs</a>
         </div>
 
         <!-- Main Workspace -->
@@ -91,10 +102,13 @@
                 <input type="text" name="site_name" class="form-control" value="<%= site_name %>">
               </div>
               <div class="admin-form-group">
-                <label>Developer / Sandbox Mode</label>
-                <div style="background-color: var(--bg-color); padding: 16px; border-radius: var(--border-radius-md); font-size: 14px; border: 1px solid var(--border-color);">
+                <label>Developer Details</label>
+                <div style="background-color: var(--bg-color); padding: 16px; border-radius: var(--border-radius-md); font-size: 14px; border: 1px solid var(--border-color); line-height: 1.8;">
                   <i class="fa-solid fa-circle-info" style="color: var(--primary-color); margin-right: 6px;"></i>
-                  Scraping data is loaded dynamically and cached in memory. Changes to settings persist to <code>content.json</code>.
+                  <strong>Admin Login Details:</strong><br>
+                  Username: <code>admin</code><br>
+                  Password: <code>seedorra-admin</code><br>
+                  <span style="color: var(--text-muted); font-size: 12px; margin-top: 6px; display: block;">These details can be checked or configured in the <code>content.json</code> file.</span>
                 </div>
               </div>
             </div>
@@ -112,14 +126,20 @@
 
                 <table class="admin-form-table">
                   <tbody>
-                    <% Object.keys(db.dictionary[langCode]).forEach(key => { %>
+                    <% if (db.dictionary[langCode]) { %>
+                      <% Object.keys(db.dictionary[langCode]).forEach(key => { %>
+                        <tr>
+                          <td><%= key.replace(/_/g, ' ') %></td>
+                          <td>
+                            <textarea name="dict_<%= langCode %>_<%= key %>" class="form-control"><%= db.dictionary[langCode][key] %></textarea>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    <% } else { %>
                       <tr>
-                        <td><%= key.replace(/_/g, ' ') %></td>
-                        <td>
-                          <textarea name="dict_<%= langCode %>_<%= key %>" class="form-control"><%= db.dictionary[langCode][key] %></textarea>
-                        </td>
+                        <td colspan="2" style="color: var(--text-muted);">No dictionary keys populated for this language.</td>
                       </tr>
-                    <% }); %>
+                    <% } %>
                   </tbody>
                 </table>
               </div>
@@ -153,7 +173,7 @@
                   </div>
                   <div>
                     <div style="background-color: var(--bg-color); height: 180px; border-radius: var(--border-radius-sm); border: 1px dashed rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                      <% if (media[key].endsWith('.jpg') || media[key].endsWith('.png') || media[key].endsWith('.jpeg') || media[key].startsWith('/uploads')) { %>
+                      <% if (media[key].endsWith('.jpg') || media[key].endsWith('.png') || media[key].endsWith('.jpeg') || media[key].startsWith('/uploads') || media[key].startsWith('/images')) { %>
                         <img src="<%= media[key] %>" alt="<%= key %>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                       <% } else { %>
                         <span style="font-size: 13px; color: var(--text-muted);">Media Asset Placeholder</span>
@@ -165,44 +185,44 @@
             </div>
           </div>
 
-          <!-- Tab 8: Campaign / Registered Users Logs -->
+          <!-- Tab 8: Campaign / Registered Users Logs & USSD Simulator -->
           <div id="tab-campaign-tab" class="admin-section">
-            <h2 style="font-size: 24px; margin-bottom: 8px;">Registered Farmers & SMS Logs</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Monitor active USSD registrations and simulated SMS alerts sent out to mobile phones.</p>
+            <h2 style="font-size: 24px; margin-bottom: 8px;">Registered Farmers & USSD Simulator</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Test the USSD phone dialer offline simulator and monitor registered users in the database.</p>
 
             <div class="tools-grid" style="margin-bottom: 40px;">
               <div style="background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; text-align: center;">
                 <div style="font-size: 40px; font-weight: 800; color: var(--primary-color);"><%= registeredUsersCount %></div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Registered Phone Subscribers</div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Total Registered Farmers</div>
               </div>
               <div style="background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; text-align: center;">
                 <div style="font-size: 40px; font-weight: 800; color: var(--accent-color);"><%= smsLog.length %></div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Simulated SMS Sent</div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Simulated SMS Broadcast Log</div>
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px;">
-              <!-- User Database -->
+            <div class="admin-grid-three-col">
+              <!-- Column 1: User Database -->
               <div>
-                <h3 style="font-size: 18px; margin-bottom: 16px;">Subscriber Database</h3>
-                <div style="overflow-x: auto; background-color: var(--bg-color); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 12px;">
+                <h3 style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-users" style="margin-right: 8px; color: var(--primary-color);"></i>Farmer Database</h3>
+                <div style="max-height: 480px; overflow-y: auto; background-color: var(--bg-color); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 12px;">
                   <% if (registeredUsers.length === 0) { %>
-                    <div style="text-align: center; color: var(--text-muted); font-size: 14px; padding: 30px;">No registered farmers found yet. Use the USSD simulator on home page to register a phone number!</div>
+                    <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px;">No registered farmers found.</div>
                   <% } else { %>
-                    <table class="price-table" style="background-color: transparent;">
+                    <table class="price-table" style="background-color: transparent; width: 100%;">
                       <thead>
                         <tr>
+                          <th>Name</th>
                           <th>Phone</th>
-                          <th>Language</th>
-                          <th>Farm (ha)</th>
+                          <th>Hectares</th>
                         </tr>
                       </thead>
                       <tbody>
                         <% registeredUsers.forEach(user => { %>
                           <tr>
-                            <td style="font-weight: 600;"><%= user.phone %></td>
-                            <td><span style="background-color: rgba(0,0,0,0.06); padding: 2px 8px; border-radius: 12px; font-size: 12px;"><%= user.lang.toUpperCase() %></span></td>
-                            <td><%= user.size %> ha</td>
+                            <td style="font-weight: 600; font-size: 13px;"><%= user.name %></td>
+                            <td style="font-size: 12px;"><%= user.phone %></td>
+                            <td style="font-size: 12px;"><%= user.size %> ha</td>
                           </tr>
                         <% }); %>
                       </tbody>
@@ -211,12 +231,51 @@
                 </div>
               </div>
 
-              <!-- SMS Feed -->
+              <!-- Column 2: Phone Simulator Chassis -->
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <h3 style="font-size: 18px; margin-bottom: 16px; align-self: flex-start;"><i class="fa-solid fa-mobile-screen-button" style="margin-right: 8px; color: var(--accent-color);"></i>USSD Test Dialer</h3>
+                
+                <div class="phone-chassis" style="transform: scale(0.9); margin-top: -30px; margin-bottom: -30px;">
+                  <div class="phone-screen">
+                    <div class="phone-status-bar">
+                      <span id="phone-time">11:18</span>
+                      <div class="phone-status-right">
+                        <i class="fa-solid fa-signal"></i>
+                        <i class="fa-solid fa-wifi"></i>
+                        <i class="fa-solid fa-battery-three-quarters"></i>
+                      </div>
+                    </div>
+
+                    <div class="phone-display" id="phone-display">
+                      <div class="phone-dialer" id="phone-dialer">
+                        <div class="dialer-input" id="dialer-input" style="font-size: 26px;"></div>
+                        <div class="dialer-grid" style="gap: 12px;">
+                          <button class="dial-btn" onclick="pressKey('1')">1</button>
+                          <button class="dial-btn" onclick="pressKey('2')">2</button>
+                          <button class="dial-btn" onclick="pressKey('3')">3</button>
+                          <button class="dial-btn" onclick="pressKey('4')">4</button>
+                          <button class="dial-btn" onclick="pressKey('5')">5</button>
+                          <button class="dial-btn" onclick="pressKey('6')">6</button>
+                          <button class="dial-btn" onclick="pressKey('7')">7</button>
+                          <button class="dial-btn" onclick="pressKey('8')">8</button>
+                          <button class="dial-btn" onclick="pressKey('9')">9</button>
+                          <button class="dial-btn" onclick="pressKey('*')">*</button>
+                          <button class="dial-btn" onclick="pressKey('0')">0</button>
+                          <button class="dial-btn" onclick="pressKey('#')">#</button>
+                          <button class="dial-btn dial-btn-call" onclick="dialUSSD()"><i class="fa-solid fa-phone"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Column 3: SMS Live Broadcast Feed -->
               <div>
-                <h3 style="font-size: 18px; margin-bottom: 16px;">SMS Logs Broadcast Feed</h3>
-                <div style="background-color: #1E1E1E; border-radius: var(--border-radius-md); padding: 20px; font-family: monospace; color: #00FF00; height: 350px; overflow-y: auto; font-size: 13px; line-height: 1.5; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);">
+                <h3 style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-terminal" style="margin-right: 8px; color: var(--text-muted);"></i>SMS Broadcast Feed</h3>
+                <div style="background-color: #1E1E1E; border-radius: var(--border-radius-md); padding: 20px; font-family: monospace; color: #00FF00; height: 380px; overflow-y: auto; font-size: 12px; line-height: 1.5; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);" id="admin-sms-log">
                   <% if (smsLog.length === 0) { %>
-                    <div style="color: #666; text-align: center; padding: 50px 0;">[SYSTEM INBOX EMPTY]<br>Awaiting SMS transmissions...</div>
+                    <div id="sms-empty-placeholder" style="color: #666; text-align: center; padding: 50px 0;">[SYSTEM INBOX EMPTY]<br>Awaiting SMS transmissions...</div>
                   <% } else { %>
                     <% smsLog.forEach(log => { %>
                       <div style="margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 12px;">
@@ -228,6 +287,7 @@
                 </div>
               </div>
             </div>
+
           </div>
 
         </div>
@@ -240,19 +300,16 @@
     function switchTab(e, tabId) {
       if (e) e.preventDefault();
       
-      // Update sidebar active link
       const links = document.querySelectorAll('.admin-menu-link');
       links.forEach(l => l.classList.remove('active'));
       if (e) e.currentTarget.classList.add('active');
 
-      // Update workspace tab display
       const sections = document.querySelectorAll('.admin-section');
       sections.forEach(s => s.classList.remove('active'));
       
       const activeSec = document.getElementById(`tab-${tabId}`);
       if (activeSec) activeSec.classList.add('active');
 
-      // Hide/Show save button footer based on section type (media/campaign don't need general save)
       const saveFooter = document.getElementById('save-footer');
       if (tabId === 'media-tab' || tabId === 'campaign-tab') {
         saveFooter.style.display = 'none';
@@ -274,13 +331,155 @@
       }
       
       alertDiv.style.display = 'block';
+      setTimeout(() => alertDiv.style.display = 'none', 5000);
       
-      // Auto-switch back to correct tab if media was uploaded
       if (urlParams.get('success') === 'media_uploaded') {
-        // find tab link
         const mediaLink = document.querySelector('.admin-menu-link[onclick*="media-tab"]');
         if (mediaLink) mediaLink.click();
       }
+    }
+
+    // --- USSD Phone Simulator Logic for Admin ---
+    let ussdSessionText = "";
+    let isUssdActive = false;
+
+    function pressKey(key) {
+      const inputDiv = document.getElementById('dialer-input');
+      if (inputDiv.textContent.length < 10) {
+        inputDiv.textContent += key;
+      }
+    }
+
+    function dialUSSD() {
+      const dialerInput = document.getElementById('dialer-input');
+      const code = dialerInput.textContent || "*384*55#";
+      
+      if (code === "*384*55#") {
+        isUssdActive = true;
+        ussdSessionText = "";
+        sendUssdRequest("");
+      } else {
+        alert("Invalid USSD code. Dial *384*55# for Seedorra services.");
+        dialerInput.textContent = "";
+      }
+    }
+
+    function sendUssdRequest(textInput) {
+      const phoneDisplay = document.getElementById('phone-display');
+      
+      fetch('/api/ussd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: textInput,
+          phoneNumber: "08039281234",
+          languageCode: "en"
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        let screenHtml = `
+          <div class="ussd-alert-card" style="padding: 12px; gap: 8px;">
+            <div class="ussd-alert-text" style="font-size: 12px; color:#000;">${data.response.replace(/\n/g, '<br>')}</div>
+        `;
+        
+        if (!data.isFinal) {
+          screenHtml += `
+            <input type="text" class="ussd-alert-input" id="ussd-input" autofocus placeholder="Answer..." style="font-size: 13px; color:#000; border-bottom:1px solid #CCC; padding: 4px 0;">
+            <div class="ussd-alert-actions" style="gap: 12px; margin-top: 6px;">
+              <button class="ussd-alert-btn" onclick="cancelUSSD()" style="font-size: 13px;">Cancel</button>
+              <button class="ussd-alert-btn" onclick="submitUSSD()" style="font-size: 13px;">Send</button>
+            </div>
+          `;
+        } else {
+          screenHtml += `
+            <div class="ussd-alert-actions" style="margin-top: 6px;">
+              <button class="ussd-alert-btn" onclick="cancelUSSD()" style="font-size: 13px;">OK</button>
+            </div>
+          `;
+          
+          if (data.response.includes("Successful") || data.response.includes("Registration")) {
+            setTimeout(simulateMockSms, 3000);
+          }
+        }
+        
+        screenHtml += `</div>`;
+        phoneDisplay.innerHTML = screenHtml;
+        
+        const ussdInput = document.getElementById('ussd-input');
+        if (ussdInput) {
+          ussdInput.focus();
+          ussdInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+              submitUSSD();
+            }
+          });
+        }
+      });
+    }
+
+    function submitUSSD() {
+      const ussdInput = document.getElementById('ussd-input');
+      if (ussdInput) {
+        const val = ussdInput.value.trim();
+        if (val !== "") {
+          ussdSessionText = ussdSessionText === "" ? val : ussdSessionText + "*" + val;
+          sendUssdRequest(ussdSessionText);
+        }
+      }
+    }
+
+    function cancelUSSD() {
+      isUssdActive = false;
+      ussdSessionText = "";
+      const phoneDisplay = document.getElementById('phone-display');
+      
+      phoneDisplay.innerHTML = `
+        <div class="phone-dialer" id="phone-dialer">
+          <div class="dialer-input" id="dialer-input"></div>
+          <div class="dialer-grid">
+            <button class="dial-btn" onclick="pressKey('1')">1</button>
+            <button class="dial-btn" onclick="pressKey('2')">2</button>
+            <button class="dial-btn" onclick="pressKey('3')">3</button>
+            <button class="dial-btn" onclick="pressKey('4')">4</button>
+            <button class="dial-btn" onclick="pressKey('5')">5</button>
+            <button class="dial-btn" onclick="pressKey('6')">6</button>
+            <button class="dial-btn" onclick="pressKey('7')">7</button>
+            <button class="dial-btn" onclick="pressKey('8')">8</button>
+            <button class="dial-btn" onclick="pressKey('9')">9</button>
+            <button class="dial-btn" onclick="pressKey('*')">*</button>
+            <button class="dial-btn" onclick="pressKey('0')">0</button>
+            <button class="dial-btn" onclick="pressKey('#')">#</button>
+            <button class="dial-btn dial-btn-call" onclick="dialUSSD()"><i class="fa-solid fa-phone"></i></button>
+          </div>
+        </div>
+      `;
+    }
+
+    function simulateMockSms() {
+      const smsText = "Seedorra Alert: Welcome registered simulator number! Standby for dry spell and crop rust alerts.";
+      
+      fetch('/api/sms/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: "08039281234", message: smsText })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const timeStr = new Date().toLocaleTimeString();
+        const logBox = document.getElementById('admin-sms-log');
+        const placeholder = document.getElementById('sms-empty-placeholder');
+        if (placeholder) placeholder.style.display = 'none';
+
+        const entryHtml = `
+          <div style="margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 12px;">
+            <span style="color: #FF00FF;">[${timeStr}]</span> <span style="color: #00FFFF;">TO: 08039281234</span><br>
+            <span style="color: #FFF;">${smsText}</span>
+          </div>
+        `;
+        
+        logBox.innerHTML = entryHtml + logBox.innerHTML;
+      });
     }
   </script>
 </body>

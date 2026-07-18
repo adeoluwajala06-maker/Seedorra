@@ -1201,3 +1201,91 @@ nav a:hover, nav a.active {
     grid-template-columns: 1fr;
   }
 }
+
+/* Footer styling matching the user screenshot */
+footer {
+  background-color: #111111;
+  color: #FFFFFF;
+  padding: 64px 0 40px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 24px;
+  color: #FFFFFF;
+  margin-bottom: 18px;
+}
+
+.footer-logo .logo-icon {
+  background-color: #FFFFFF;
+  color: #1A5718 !important; /* Bold green S */
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.footer-link-group h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 20px;
+}
+
+.footer-link-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-link-group ul li, .footer-link-group ul li a {
+  font-size: 14.5px;
+  color: #888888;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.footer-link-group ul li a:hover {
+  color: #FFFFFF;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13.5px;
+  color: #888888;
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}

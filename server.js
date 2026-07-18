@@ -192,12 +192,33 @@ app.get('/', async (req, res) => {
     lang = 'en';
   }
 
+  // Self-heal theme if missing
+  if (!db.theme) {
+    db.theme = {
+      primary_color: "#1A5718",
+      primary_hover: "#113A10",
+      secondary_color: "#56B259",
+      accent_color: "#8C62FF",
+      bg_color: "#F8F9FA",
+      surface_color: "#FFFFFF",
+      text_main: "#1A1A1A",
+      text_muted: "#6C757D"
+    };
+  }
+
   const dict = db.dictionary[lang];
   const prices = await scrapePrices();
 
   // Get Client IP to check if they have completed onboarding
   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip;
-  const showOnboarding = !db.seen_onboarding_ips.includes(clientIp);
+  
+  // Support administrative live customizer mirror previews
+  const isPreview = req.query.preview === 'true';
+  const showOnboarding = isPreview 
+    ? req.query.show_onboarding === 'true'
+    : !db.seen_onboarding_ips.includes(clientIp);
+    
+  const showDashboard = isPreview && req.query.show_dashboard === 'true';
 
   res.render('index', {
     site_name: db.site_name,
@@ -207,7 +228,9 @@ app.get('/', async (req, res) => {
     prices: prices,
     weatherData: WEATHER_DATA,
     pestAlerts: PEST_ALERTS,
-    showOnboarding: showOnboarding
+    showOnboarding: showOnboarding,
+    showDashboard: showDashboard,
+    theme: db.theme
   });
 });
 
@@ -454,6 +477,20 @@ app.post('/api/diagnose', upload.single('plant_photo'), (req, res) => {
 // Admin Panel login/dashboard
 app.get('/admin', (req, res) => {
   const db = readDb();
+  
+  if (!db.theme) {
+    db.theme = {
+      primary_color: "#1A5718",
+      primary_hover: "#113A10",
+      secondary_color: "#56B259",
+      accent_color: "#8C62FF",
+      bg_color: "#F8F9FA",
+      surface_color: "#FFFFFF",
+      text_main: "#1A1A1A",
+      text_muted: "#6C757D"
+    };
+  }
+
   const lang = req.query.lang || 'en';
   const dict = db.dictionary[lang] || db.dictionary['en'];
 
@@ -464,6 +501,7 @@ app.get('/admin', (req, res) => {
     media: db.media,
     db: db,
     dict: dict,
+    theme: db.theme,
     lang: lang,
     auth: req.query.auth || '',
     isAuthorized: isAuthorized,
@@ -483,6 +521,20 @@ app.post('/admin/save', (req, res) => {
   }
 
   db.site_name = req.body.site_name || db.site_name;
+
+  // Save color theme variables
+  if (req.body.primary_color) {
+    db.theme = {
+      primary_color: req.body.primary_color,
+      primary_hover: req.body.primary_hover || req.body.primary_color,
+      secondary_color: req.body.secondary_color,
+      accent_color: req.body.accent_color,
+      bg_color: req.body.bg_color,
+      surface_color: req.body.surface_color,
+      text_main: req.body.text_main,
+      text_muted: req.body.text_muted
+    };
+  }
 
   Object.keys(db.dictionary).forEach(langCode => {
     Object.keys(db.dictionary[langCode]).forEach(key => {

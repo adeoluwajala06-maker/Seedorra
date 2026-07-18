@@ -3,253 +3,410 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seedorra Back Access Admin Panel</title>
-  <link rel="stylesheet" href="/css/layout.css">
+  <title>Seedorra Back Access Admin Panel & Visual Customizer</title>
+  <link class="main-css-tag" rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary-color: <%= theme.primary_color %>;
+      --primary-hover: <%= theme.primary_hover %>;
+      --secondary-color: <%= theme.secondary_color %>;
+      --accent-color: <%= theme.accent_color %>;
+      --bg-color: <%= theme.bg_color %>;
+      --surface-color: <%= theme.surface_color %>;
+      --text-main: <%= theme.text_main %>;
+      --text-muted: <%= theme.text_muted %>;
+    }
+
+    body {
+      overflow-y: hidden; /* Sticky viewport layout */
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .customizer-wrapper {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      flex-grow: 1;
+      height: calc(100vh - 80px);
+      background-color: #F1F3F5;
+      overflow: hidden;
+    }
+
+    .customizer-sidebar {
+      background-color: var(--surface-color);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .customizer-sidebar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-color);
+    }
+
+    .customizer-sidebar-body {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .customizer-preview-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 24px;
+      gap: 16px;
+      background-color: #E9ECEF;
+      position: relative;
+    }
+
+    .preview-bar {
+      background-color: var(--surface-color);
+      padding: 12px 24px;
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .preview-iframe-wrapper {
+      flex-grow: 1;
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      background-color: #FFF;
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .customizer-accordion-item {
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      margin-bottom: 16px;
+      background-color: var(--surface-color);
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .customizer-accordion-header {
+      padding: 16px 20px;
+      background-color: var(--bg-color);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid transparent;
+    }
+
+    .customizer-accordion-header.active {
+      border-bottom-color: var(--border-color);
+    }
+
+    .customizer-accordion-content {
+      padding: 20px;
+      display: none;
+    }
+
+    .customizer-accordion-content.active {
+      display: block;
+    }
+
+    .color-picker-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .color-picker-item label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .color-picker-item input[type="color"] {
+      border: none;
+      width: 44px;
+      height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      background: none;
+    }
+
     .admin-form-table {
       width: 100%;
       border-collapse: collapse;
     }
+
     .admin-form-table td {
-      padding: 12px 8px;
+      padding: 10px 0;
       vertical-align: top;
     }
-    .admin-form-table td:first-child {
-      width: 250px;
+
+    .admin-form-table td label {
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--text-main);
+      display: block;
+      margin-bottom: 4px;
     }
-    .admin-grid-three-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 24px;
-      margin-top: 24px;
+
+    .preview-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      background: none;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      color: var(--text-muted);
     }
-    @media (max-width: 1200px) {
-      .admin-grid-three-col {
-        grid-template-columns: 1fr;
-      }
+
+    .preview-btn.active {
+      background-color: var(--primary-color);
+      color: #fff;
+      border-color: var(--primary-color);
+    }
+
+    /* Fixed Layout Header Override */
+    header {
+      height: 80px;
+      flex-shrink: 0;
     }
   </style>
 </head>
-<body style="background-color: var(--bg-color);">
+<body>
 
-  <!-- Header -->
+  <!-- Admin Header bar -->
   <header>
     <div class="container nav-wrapper">
-      <a href="/" class="logo-link">
+      <a href="/admin?auth=<%= auth %>" class="logo-link">
         <div class="logo-icon">S</div>
-        <%= site_name %> Admin
+        <%= site_name %> Visual Customizer
       </a>
       <nav>
-        <a href="/"><i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Back to Website</a>
+        <span style="font-size: 13.5px; color: var(--text-muted); margin-right: 12px;"><i class="fa-solid fa-user-shield" style="color: var(--secondary-color); margin-right: 6px;"></i>Authorized Access</span>
+        <a href="/" target="_blank" class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px;"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right: 6px;"></i>Launch Site</a>
       </nav>
     </div>
   </header>
 
-  <div class="container">
+  <div class="customizer-wrapper">
     <% if (!isAuthorized) { %>
-      <!-- Simple Password Access Screen -->
-      <div style="max-width: 420px; margin: 100px auto; padding: 40px; background-color: var(--surface-color); border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); text-align: center;">
-        <i class="fa-solid fa-lock" style="font-size: 48px; color: var(--accent-color); margin-bottom: 20px;"></i>
-        <h2 style="font-size: 24px; margin-bottom: 8px;">Seedorra Admin Portal</h2>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Enter password to unlock back access and edit content.</p>
-        
-        <form action="/admin" method="GET">
-          <div class="form-group" style="text-align: left;">
-            <label>Admin Password</label>
-            <input type="password" name="auth" class="form-control" placeholder="Enter admin password" required>
-          </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Unlock Back Access</button>
-        </form>
+      <!-- Center Lock screen -->
+      <div style="grid-column: span 2; display: flex; justify-content: center; align-items: center; height: 100%;">
+        <div style="max-width: 420px; width: 90%; padding: 40px; background-color: var(--surface-color); border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); text-align: center;">
+          <i class="fa-solid fa-lock" style="font-size: 48px; color: var(--accent-color); margin-bottom: 20px;"></i>
+          <h2 style="font-size: 24px; margin-bottom: 8px;">Seedorra Customizer</h2>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Please input the master admin password to customize templates.</p>
+          
+          <form action="/admin" method="GET">
+            <div class="form-group" style="text-align: left;">
+              <label>Admin Password</label>
+              <input type="password" name="auth" class="form-control" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Unlock Customizer</button>
+          </form>
+        </div>
       </div>
 
     <% } else { %>
-      <!-- Full Authorized Admin Dashboard -->
-      <div class="admin-grid">
-        <!-- Sidebar Navigation -->
-        <div class="admin-sidebar">
-          <h4 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; padding: 0 16px;">Sections</h4>
-          <a href="#" class="admin-menu-link active" onclick="switchTab(event, 'general')"><i class="fa-solid fa-gears" style="margin-right: 10px; width: 16px;"></i>General Settings</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-en')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>English Copy</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-yo')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Yoruba Copy</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-ha')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Hausa Copy</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-ig')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Igbo Copy</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-pcm')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Pidgin Copy</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'media-tab')"><i class="fa-solid fa-images" style="margin-right: 10px; width: 16px;"></i>Media Files</a>
-          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'campaign-tab')"><i class="fa-solid fa-tower-cell" style="margin-right: 10px; width: 16px;"></i>USSD Simulator & Logs</a>
+      <!-- Split-screen editor layout -->
+      
+      <!-- Left customizer settings pane -->
+      <div class="customizer-sidebar">
+        <div class="customizer-sidebar-header">
+          <h3 style="font-size: 18px; line-height: 1.2;">Live Site Editor</h3>
+          <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">Adjust layouts, colors, and copy. Save to reload the preview mirror.</p>
+          
+          <!-- Success Notification Alert inside Customizer -->
+          <div id="success-alert" class="admin-alert admin-alert-success" style="display: none; font-size: 13px; padding: 10px; margin-top: 12px; margin-bottom: 0;">
+            <i class="fa-solid fa-circle-check" style="margin-right: 6px;"></i>
+            <span>Saved successfully!</span>
+          </div>
         </div>
 
-        <!-- Main Workspace -->
-        <div class="admin-content">
-          <!-- Success Notification Alert -->
-          <div id="success-alert" class="admin-alert admin-alert-success" style="display: none;">
-            <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>
-            <span>Changes saved successfully! Content updated instantly.</span>
-          </div>
-
-          <form id="admin-main-form" action="/admin/save" method="POST">
+        <div class="customizer-sidebar-body">
+          <form id="customizer-main-form" action="/admin/save" method="POST">
             <input type="hidden" name="auth" value="<%= auth %>">
 
-            <!-- Tab 1: General Settings -->
-            <div id="tab-general" class="admin-section active">
-              <h2 style="font-size: 24px; margin-bottom: 8px;">General Settings</h2>
-              <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Manage global site configurations here.</p>
-              
-              <div class="admin-form-group">
-                <label>Website Name</label>
-                <input type="text" name="site_name" class="form-control" value="<%= site_name %>">
+            <!-- Section 1: Color Palette Theme variables -->
+            <div class="customizer-accordion-item">
+              <div class="customizer-accordion-header active" onclick="toggleAccordion(this)">
+                <span>🎨 Visual Color Theme</span>
+                <i class="fa-solid fa-chevron-down"></i>
               </div>
-              <div class="admin-form-group">
-                <label>Developer Details</label>
-                <div style="background-color: var(--bg-color); padding: 16px; border-radius: var(--border-radius-md); font-size: 14px; border: 1px solid var(--border-color); line-height: 1.8;">
-                  <i class="fa-solid fa-circle-info" style="color: var(--primary-color); margin-right: 6px;"></i>
-                  <strong>Admin Login Details:</strong><br>
-                  Username: <code>admin</code><br>
-                  Password: <code>seedorra-admin</code><br>
-                  <span style="color: var(--text-muted); font-size: 12px; margin-top: 6px; display: block;">These details can be checked or configured in the <code>content.json</code> file.</span>
+              <div class="customizer-accordion-content active">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div class="color-picker-item">
+                    <label>Primary Theme (Forest Green)</label>
+                    <input type="color" name="primary_color" value="<%= theme.primary_color %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Primary Hover Color</label>
+                    <input type="color" name="primary_hover" value="<%= theme.primary_hover || theme.primary_color %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Secondary Accent (Light Green)</label>
+                    <input type="color" name="secondary_color" value="<%= theme.secondary_color %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Accent Color (Purple Highlights)</label>
+                    <input type="color" name="accent_color" value="<%= theme.accent_color %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Site Background</label>
+                    <input type="color" name="bg_color" value="<%= theme.bg_color %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Surface Cards Background</label>
+                    <input type="color" name="surface_color" value="<%= theme.surface_color %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Main Body Text</label>
+                    <input type="color" name="text_main" value="<%= theme.text_main %>">
+                  </div>
+                  <div class="color-picker-item">
+                    <label>Muted Subtitles Text</label>
+                    <input type="color" name="text_muted" value="<%= theme.text_muted %>">
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Tabs for Languages Copy -->
-            <% ['en', 'yo', 'ha', 'ig', 'pcm'].forEach(langCode => { %>
-              <div id="tab-lang-<%= langCode %>" class="admin-section">
-                <h2 style="font-size: 24px; margin-bottom: 8px;">
-                  <%= langCode === 'en' ? 'English (🇬🇧)' :
-                      langCode === 'yo' ? 'Yoruba (🇳🇬)' :
-                      langCode === 'ha' ? 'Hausa (🇳🇬)' :
-                      langCode === 'ig' ? 'Igbo (🇳🇬)' : 'Pidgin (🇳🇬)' %> Copy Manager
-                </h2>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Translate and customize every text block for this language.</p>
-
-                <table class="admin-form-table">
-                  <tbody>
-                    <% if (db.dictionary[langCode]) { %>
-                      <% Object.keys(db.dictionary[langCode]).forEach(key => { %>
-                        <tr>
-                          <td><%= key.replace(/_/g, ' ') %></td>
-                          <td>
-                            <textarea name="dict_<%= langCode %>_<%= key %>" class="form-control"><%= db.dictionary[langCode][key] %></textarea>
-                          </td>
-                        </tr>
-                      <% }); %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="2" style="color: var(--text-muted);">No dictionary keys populated for this language.</td>
-                      </tr>
-                    <% } %>
-                  </tbody>
-                </table>
+            <!-- Section 2: Global configuration parameters -->
+            <div class="customizer-accordion-item">
+              <div class="customizer-accordion-header" onclick="toggleAccordion(this)">
+                <span>⚙️ General Settings</span>
+                <i class="fa-solid fa-chevron-down"></i>
               </div>
-            <% }); %>
+              <div class="customizer-accordion-content">
+                <div class="form-group">
+                  <label>Website Name</label>
+                  <input type="text" name="site_name" class="form-control" value="<%= site_name %>">
+                </div>
+                <div style="background-color: var(--bg-color); padding: 12px; border-radius: var(--border-radius-sm); font-size: 12.5px; border: 1px solid var(--border-color); line-height: 1.6;">
+                  <strong>Admin Login Details:</strong><br>
+                  Username: <code>admin</code><br>
+                  Password: <code>seedorra-admin</code>
+                </div>
+              </div>
+            </div>
 
-            <!-- Save button floating footer for text forms -->
-            <div id="save-footer" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px; display: flex; justify-content: flex-end;">
-              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i>Save Changes</button>
+            <!-- Section 3: Text Translations & Content Editor -->
+            <div class="customizer-accordion-item">
+              <div class="customizer-accordion-header" onclick="toggleAccordion(this)">
+                <span>📝 Localized Copy Dictionary</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+              <div class="customizer-accordion-content" style="padding: 16px 12px;">
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label>Active Copy Language</label>
+                  <select class="form-control" id="customizer-lang-select" onchange="switchEditLanguage(this.value)">
+                    <option value="en">English (🇬🇧)</option>
+                    <option value="yo">Yoruba (🇳🇬)</option>
+                    <option value="ha">Hausa (🇳🇬)</option>
+                    <option value="ig">Igbo (🇳🇬)</option>
+                    <option value="pcm">Pidgin (🇳🇬)</option>
+                  </select>
+                </div>
+
+                <!-- Accordions for each language dictionary -->
+                <% ['en', 'yo', 'ha', 'ig', 'pcm'].forEach(langCode => { %>
+                  <div class="customizer-lang-subpanel" id="lang-subpanel-<%= langCode %>" style="display: <%= langCode === 'en' ? 'block' : 'none' %>;">
+                    <table class="admin-form-table">
+                      <tbody>
+                        <% if (db.dictionary[langCode]) { %>
+                          <% Object.keys(db.dictionary[langCode]).forEach(key => { %>
+                            <tr>
+                              <td>
+                                <label style="text-transform: capitalize;"><%= key.replace(/_/g, ' ') %></label>
+                                <textarea name="dict_<%= langCode %>_<%= key %>" class="form-control" style="font-size: 13px; height: 72px; padding: 8px;"><%= db.dictionary[langCode][key] %></textarea>
+                              </td>
+                            </tr>
+                          <% }); %>
+                        <% } else { %>
+                          <tr>
+                            <td style="color: var(--text-muted); font-size: 13px;">No copy keys registered for this language.</td>
+                          </tr>
+                        <% } %>
+                      </tbody>
+                    </table>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+              <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i>Save & Apply Changes</button>
             </div>
           </form>
 
-          <!-- Tab 7: Media Files (Handled in separate post forms) -->
-          <div id="tab-media-tab" class="admin-section">
-            <h2 style="font-size: 24px; margin-bottom: 8px;">Media Assets Manager</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Upload images from your computer to replace icons and banners on the landing page.</p>
-
-            <div style="display: flex; flex-direction: column; gap: 32px;">
-              <% Object.keys(media).forEach(key => { %>
-                <div style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;">
-                  <div>
-                    <h4 style="text-transform: capitalize; margin-bottom: 8px;"><%= key.replace(/_/g, ' ') %></h4>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Current file path: <code><%= media[key] %></code></p>
+          <!-- Section 4: Media Assets File Uploader -->
+          <div class="customizer-accordion-item">
+            <div class="customizer-accordion-header" onclick="toggleAccordion(this)">
+              <span>🖼️ Upload Media Files</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="customizer-accordion-content">
+              <div style="display: flex; flex-direction: column; gap: 24px;">
+                <% Object.keys(media).forEach(key => { %>
+                  <div style="border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 20px;">
+                    <h5 style="text-transform: capitalize; margin-bottom: 6px; font-size: 14px;"><%= key.replace(/_/g, ' ') %></h5>
+                    <div style="width: 100%; height: 100px; border-radius: var(--border-radius-sm); border: 1px dashed rgba(0,0,0,0.15); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: var(--bg-color);">
+                      <img src="<%= media[key] %>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                    </div>
                     <form action="/admin/upload" method="POST" enctype="multipart/form-data">
                       <input type="hidden" name="auth" value="<%= auth %>">
                       <input type="hidden" name="media_key" value="<%= key %>">
-                      <div class="form-group">
-                        <input type="file" name="media_file" class="form-control" style="padding: 6px;" required>
+                      <div class="form-group" style="margin-bottom: 8px;">
+                        <input type="file" name="media_file" class="form-control" style="padding: 4px; font-size: 12px;" required>
                       </div>
-                      <button type="submit" class="btn btn-secondary" style="padding: 10px 20px;"><i class="fa-solid fa-upload" style="margin-right: 8px;"></i>Upload & Replace</button>
+                      <button type="submit" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; width: 100%;"><i class="fa-solid fa-upload" style="margin-right: 4px;"></i>Upload & Replace</button>
                     </form>
                   </div>
-                  <div>
-                    <div style="background-color: var(--bg-color); height: 180px; border-radius: var(--border-radius-sm); border: 1px dashed rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                      <% if (media[key].endsWith('.jpg') || media[key].endsWith('.png') || media[key].endsWith('.jpeg') || media[key].startsWith('/uploads') || media[key].startsWith('/images')) { %>
-                        <img src="<%= media[key] %>" alt="<%= key %>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                      <% } else { %>
-                        <span style="font-size: 13px; color: var(--text-muted);">Media Asset Placeholder</span>
-                      <% } %>
-                    </div>
-                  </div>
-                </div>
-              <% }); %>
+                <% }); %>
+              </div>
             </div>
           </div>
 
-          <!-- Tab 8: Campaign / Registered Users Logs & USSD Simulator -->
-          <div id="tab-campaign-tab" class="admin-section">
-            <h2 style="font-size: 24px; margin-bottom: 8px;">Registered Farmers & USSD Simulator</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Test the USSD phone dialer offline simulator and monitor registered users in the database.</p>
-
-            <div class="tools-grid" style="margin-bottom: 40px;">
-              <div style="background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; text-align: center;">
-                <div style="font-size: 40px; font-weight: 800; color: var(--primary-color);"><%= registeredUsersCount %></div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Total Registered Farmers</div>
-              </div>
-              <div style="background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; text-align: center;">
-                <div style="font-size: 40px; font-weight: 800; color: var(--accent-color);"><%= smsLog.length %></div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Simulated SMS Broadcast Log</div>
-              </div>
+          <!-- Section 5: Handset USSD offline Simulator -->
+          <div class="customizer-accordion-item">
+            <div class="customizer-accordion-header" onclick="toggleAccordion(this)">
+              <span>📱 Offline USSD dialer</span>
+              <i class="fa-solid fa-chevron-down"></i>
             </div>
-
-            <div class="admin-grid-three-col">
-              <!-- Column 1: User Database -->
-              <div>
-                <h3 style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-users" style="margin-right: 8px; color: var(--primary-color);"></i>Farmer Database</h3>
-                <div style="max-height: 480px; overflow-y: auto; background-color: var(--bg-color); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 12px;">
-                  <% if (registeredUsers.length === 0) { %>
-                    <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px;">No registered farmers found.</div>
-                  <% } else { %>
-                    <table class="price-table" style="background-color: transparent; width: 100%;">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Phone</th>
-                          <th>Hectares</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <% registeredUsers.forEach(user => { %>
-                          <tr>
-                            <td style="font-weight: 600; font-size: 13px;"><%= user.name %></td>
-                            <td style="font-size: 12px;"><%= user.phone %></td>
-                            <td style="font-size: 12px;"><%= user.size %> ha</td>
-                          </tr>
-                        <% }); %>
-                      </tbody>
-                    </table>
-                  <% } %>
-                </div>
-              </div>
-
-              <!-- Column 2: Phone Simulator Chassis -->
-              <div style="display: flex; flex-direction: column; align-items: center;">
-                <h3 style="font-size: 18px; margin-bottom: 16px; align-self: flex-start;"><i class="fa-solid fa-mobile-screen-button" style="margin-right: 8px; color: var(--accent-color);"></i>USSD Test Dialer</h3>
-                
-                <div class="phone-chassis" style="transform: scale(0.9); margin-top: -30px; margin-bottom: -30px;">
+            <div class="customizer-accordion-content" style="padding: 16px 8px;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                <div class="phone-chassis" style="transform: scale(0.85); margin-top: -40px; margin-bottom: -40px; border-color: #444;">
                   <div class="phone-screen">
-                    <div class="phone-status-bar">
-                      <span id="phone-time">11:18</span>
+                    <div class="phone-status-bar" style="background-color: #000;">
+                      <span>12:18</span>
                       <div class="phone-status-right">
                         <i class="fa-solid fa-signal"></i>
-                        <i class="fa-solid fa-wifi"></i>
-                        <i class="fa-solid fa-battery-three-quarters"></i>
+                        <i class="fa-solid fa-battery-full"></i>
                       </div>
                     </div>
-
                     <div class="phone-display" id="phone-display">
                       <div class="phone-dialer" id="phone-dialer">
-                        <div class="dialer-input" id="dialer-input" style="font-size: 26px;"></div>
-                        <div class="dialer-grid" style="gap: 12px;">
+                        <div class="dialer-input" id="dialer-input" style="font-size: 24px; min-height: 36px;"></div>
+                        <div class="dialer-grid" style="gap: 8px;">
                           <button class="dial-btn" onclick="pressKey('1')">1</button>
                           <button class="dial-btn" onclick="pressKey('2')">2</button>
                           <button class="dial-btn" onclick="pressKey('3')">3</button>
@@ -268,78 +425,187 @@
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Column 3: SMS Live Broadcast Feed -->
-              <div>
-                <h3 style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-terminal" style="margin-right: 8px; color: var(--text-muted);"></i>SMS Broadcast Feed</h3>
-                <div style="background-color: #1E1E1E; border-radius: var(--border-radius-md); padding: 20px; font-family: monospace; color: #00FF00; height: 380px; overflow-y: auto; font-size: 12px; line-height: 1.5; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);" id="admin-sms-log">
-                  <% if (smsLog.length === 0) { %>
-                    <div id="sms-empty-placeholder" style="color: #666; text-align: center; padding: 50px 0;">[SYSTEM INBOX EMPTY]<br>Awaiting SMS transmissions...</div>
-                  <% } else { %>
-                    <% smsLog.forEach(log => { %>
-                      <div style="margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 12px;">
-                        <span style="color: #FF00FF;">[<%= log.timestamp %>]</span> <span style="color: #00FFFF;">TO: <%= log.phone %></span><br>
-                        <span style="color: #FFF;"><%= log.message %></span>
-                      </div>
-                    <% }); %>
-                  <% } %>
+                <div style="width: 100%;">
+                  <h5 style="font-size: 13px; margin-bottom: 8px;"><i class="fa-solid fa-terminal" style="margin-right: 6px; color: var(--accent-color);"></i>Live Broadcast Feed</h5>
+                  <div style="background-color: #121212; border-radius: var(--border-radius-sm); padding: 12px; font-family: monospace; color: #00FF00; height: 180px; overflow-y: auto; font-size: 11px;" id="admin-sms-log">
+                    <% if (smsLog.length === 0) { %>
+                      <div id="sms-empty-placeholder" style="color: #555; text-align: center; padding-top: 60px;">Awaiting SMS broadcast logs...</div>
+                    <% } else { %>
+                      <% smsLog.forEach(log => { %>
+                        <div style="margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px;">
+                          <span style="color: #FF00FF;">[<%= log.timestamp %>]</span> <span style="color: #00FFFF;">TO: <%= log.phone %></span><br>
+                          <span style="color: #FFF;"><%= log.message %></span>
+                        </div>
+                      <% }); %>
+                    <% } %>
+                  </div>
                 </div>
               </div>
             </div>
-
           </div>
 
+          <!-- Section 6: Registered Farmers list -->
+          <div class="customizer-accordion-item">
+            <div class="customizer-accordion-header" onclick="toggleAccordion(this)">
+              <span>👥 Farmer Database</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="customizer-accordion-content" style="padding: 16px 12px;">
+              <div style="text-align: center; background-color: var(--bg-color); padding: 16px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px;">
+                <div style="font-size: 32px; font-weight: 800; color: var(--primary-color);"><%= registeredUsersCount %></div>
+                <div style="font-size: 12px; color: var(--text-muted);">Registered Farmers</div>
+              </div>
+
+              <div style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 8px; background-color: var(--bg-color);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                  <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color); text-align: left;">
+                      <th style="padding: 6px;">Name</th>
+                      <th style="padding: 6px;">Phone</th>
+                      <th style="padding: 6px;">Size</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% registeredUsers.forEach(user => { %>
+                      <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <td style="padding: 6px; font-weight: 700;"><%= user.name %></td>
+                        <td style="padding: 6px;"><%= user.phone %></td>
+                        <td style="padding: 6px;"><%= user.size %> ha</td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right sticky preview mirror pane -->
+      <div class="customizer-preview-container">
+        
+        <!-- Live Mirror Viewport options -->
+        <div class="preview-bar">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-weight: 700; font-size: 14px; margin-right: 12px; color: var(--text-main);"><i class="fa-solid fa-desktop" style="margin-right: 6px; color: var(--primary-color);"></i>Visual Preview Mirror</span>
+            <button class="preview-btn active" id="btn-prev-home" onclick="setPreviewUrl('home')">Home Landing Page</button>
+            <button class="preview-btn" id="btn-prev-onboard" onclick="setPreviewUrl('onboard')">Onboarding Slides</button>
+            <button class="preview-btn" id="btn-prev-dashboard" onclick="setPreviewUrl('dashboard')">Farmer Dashboard</button>
+          </div>
+
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-size: 12.5px; color: var(--text-muted);">Preview Lang:</span>
+            <select class="form-control" style="width: auto; padding: 4px 10px; font-size: 12px;" id="preview-lang-select" onchange="updatePreviewLanguage(this.value)">
+              <option value="en">🇬🇧 EN</option>
+              <option value="yo">🇳🇬 YO</option>
+              <option value="ha">🇳🇬 HA</option>
+              <option value="ig">🇳🇬 IG</option>
+              <option value="pcm">🇳🇬 PCM</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Website Preview frame -->
+        <div class="preview-iframe-wrapper">
+          <iframe id="preview-iframe" src="/?preview=true"></iframe>
         </div>
       </div>
     <% } %>
   </div>
 
   <script>
-    // Tab switching in Admin Layout
-    function switchTab(e, tabId) {
-      if (e) e.preventDefault();
+    // Toggle accordion sidebar menus
+    function toggleAccordion(header) {
+      header.classList.toggle('active');
+      const content = header.nextElementSibling;
+      content.classList.toggle('active');
       
-      const links = document.querySelectorAll('.admin-menu-link');
-      links.forEach(l => l.classList.remove('active'));
-      if (e) e.currentTarget.classList.add('active');
-
-      const sections = document.querySelectorAll('.admin-section');
-      sections.forEach(s => s.classList.remove('active'));
-      
-      const activeSec = document.getElementById(`tab-${tabId}`);
-      if (activeSec) activeSec.classList.add('active');
-
-      const saveFooter = document.getElementById('save-footer');
-      if (tabId === 'media-tab' || tabId === 'campaign-tab') {
-        saveFooter.style.display = 'none';
+      const icon = header.querySelector('i');
+      if (content.classList.contains('active')) {
+        icon.className = "fa-solid fa-chevron-up";
       } else {
-        saveFooter.style.display = 'flex';
+        icon.className = "fa-solid fa-chevron-down";
       }
     }
 
-    // Check query params for success messages
+    // Switch dictionary text editing language fields
+    function switchEditLanguage(lang) {
+      document.querySelectorAll('.customizer-lang-subpanel').forEach(p => p.style.display = 'none');
+      const targetPanel = document.getElementById(`lang-subpanel-${lang}`);
+      if (targetPanel) targetPanel.style.display = 'block';
+
+      // Update the preview language selector to sync
+      const prevLangSelect = document.getElementById('preview-lang-select');
+      if (prevLangSelect) {
+        prevLangSelect.value = lang;
+        updatePreviewLanguage(lang);
+      }
+    }
+
+    // --- Visual preview iframe url state machine controllers ---
+    let activePreviewScreen = 'home'; // 'home', 'onboard', 'dashboard'
+    let activePreviewLanguage = 'en';
+
+    function setPreviewUrl(screen) {
+      activePreviewScreen = screen;
+      
+      document.querySelectorAll('.preview-btn').forEach(btn => btn.classList.remove('active'));
+      if (screen === 'home') document.getElementById('btn-prev-home').classList.add('active');
+      if (screen === 'onboard') document.getElementById('btn-prev-onboard').classList.add('active');
+      if (screen === 'dashboard') document.getElementById('btn-prev-dashboard').classList.add('active');
+
+      reloadPreviewIframe();
+    }
+
+    function updatePreviewLanguage(lang) {
+      activePreviewLanguage = lang;
+      reloadPreviewIframe();
+    }
+
+    function reloadPreviewIframe() {
+      const iframe = document.getElementById('preview-iframe');
+      if (!iframe) return;
+
+      let url = `/?preview=true&lang=${activePreviewLanguage}`;
+      if (activePreviewScreen === 'onboard') {
+        url += '&show_onboarding=true';
+      } else if (activePreviewScreen === 'dashboard') {
+        url += '&show_dashboard=true';
+      }
+
+      iframe.src = url;
+    }
+
+    // Check query params for visual customizer success alerts
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success')) {
       const alertDiv = document.getElementById('success-alert');
       const textSpan = alertDiv.querySelector('span');
       
       if (urlParams.get('success') === 'saved') {
-        textSpan.textContent = "Text content updated successfully! Reload home page to see changes.";
+        textSpan.textContent = "Changes saved! Preview mirror reloaded.";
       } else if (urlParams.get('success') === 'media_uploaded') {
-        textSpan.textContent = "Media file replaced successfully! Banner image updated.";
+        textSpan.textContent = "Media replaced! New asset uploaded.";
       }
       
       alertDiv.style.display = 'block';
       setTimeout(() => alertDiv.style.display = 'none', 5000);
       
+      // Expand upload section accordion if upload succeeded
       if (urlParams.get('success') === 'media_uploaded') {
-        const mediaLink = document.querySelector('.admin-menu-link[onclick*="media-tab"]');
-        if (mediaLink) mediaLink.click();
+        const accordionHeaders = document.querySelectorAll('.customizer-accordion-header');
+        accordionHeaders.forEach(h => {
+          if (h.textContent.includes("Media")) {
+            h.classList.add('active');
+            h.nextElementSibling.classList.add('active');
+          }
+        });
       }
     }
 
-    // --- USSD Phone Simulator Logic for Admin ---
+    // --- USSD Phone Simulator Dialing Handlers inside customizer ---
     let ussdSessionText = "";
     let isUssdActive = false;
 
@@ -359,7 +625,7 @@
         ussdSessionText = "";
         sendUssdRequest("");
       } else {
-        alert("Invalid USSD code. Dial *384*55# for Seedorra services.");
+        alert("Invalid USSD code. Dial *384*55# to launch the test dialer.");
         dialerInput.textContent = "";
       }
     }
@@ -379,22 +645,22 @@
       .then(res => res.json())
       .then(data => {
         let screenHtml = `
-          <div class="ussd-alert-card" style="padding: 12px; gap: 8px;">
-            <div class="ussd-alert-text" style="font-size: 12px; color:#000;">${data.response.replace(/\n/g, '<br>')}</div>
+          <div class="ussd-alert-card" style="padding: 10px; gap: 6px;">
+            <div class="ussd-alert-text" style="font-size: 11px; color:#000;">${data.response.replace(/\n/g, '<br>')}</div>
         `;
         
         if (!data.isFinal) {
           screenHtml += `
-            <input type="text" class="ussd-alert-input" id="ussd-input" autofocus placeholder="Answer..." style="font-size: 13px; color:#000; border-bottom:1px solid #CCC; padding: 4px 0;">
-            <div class="ussd-alert-actions" style="gap: 12px; margin-top: 6px;">
-              <button class="ussd-alert-btn" onclick="cancelUSSD()" style="font-size: 13px;">Cancel</button>
-              <button class="ussd-alert-btn" onclick="submitUSSD()" style="font-size: 13px;">Send</button>
+            <input type="text" class="ussd-alert-input" id="ussd-input" autofocus placeholder="Reply..." style="font-size: 12px; color:#000; padding: 2px 0;">
+            <div class="ussd-alert-actions" style="gap: 8px; margin-top: 4px;">
+              <button class="ussd-alert-btn" onclick="cancelUSSD()" style="font-size: 12px;">Cancel</button>
+              <button class="ussd-alert-btn" onclick="submitUSSD()" style="font-size: 12px;">Send</button>
             </div>
           `;
         } else {
           screenHtml += `
-            <div class="ussd-alert-actions" style="margin-top: 6px;">
-              <button class="ussd-alert-btn" onclick="cancelUSSD()" style="font-size: 13px;">OK</button>
+            <div class="ussd-alert-actions" style="margin-top: 4px;">
+              <button class="ussd-alert-btn" onclick="cancelUSSD()" style="font-size: 12px;">OK</button>
             </div>
           `;
           
@@ -457,7 +723,7 @@
     }
 
     function simulateMockSms() {
-      const smsText = "Seedorra Alert: Welcome registered simulator number! Standby for dry spell and crop rust alerts.";
+      const smsText = "Seedorra Alert: Simulator line registered successfully! Expect seasonal planting suggestions shortly.";
       
       fetch('/api/sms/send', {
         method: 'POST',
@@ -472,13 +738,15 @@
         if (placeholder) placeholder.style.display = 'none';
 
         const entryHtml = `
-          <div style="margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 12px;">
+          <div style="margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px;">
             <span style="color: #FF00FF;">[${timeStr}]</span> <span style="color: #00FFFF;">TO: 08039281234</span><br>
             <span style="color: #FFF;">${smsText}</span>
           </div>
         `;
-        
         logBox.innerHTML = entryHtml + logBox.innerHTML;
+        
+        // Reload preview frame to sync dashboard stats
+        reloadPreviewIframe();
       });
     }
   </script>

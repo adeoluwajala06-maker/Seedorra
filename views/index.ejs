@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= site_name %> - <%= dict.hero_title %></title>
+  <meta name="description" content="<%= dict.hero_subtitle %>">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="/" class="logo-link">
+        <div class="logo-icon">S</div>
+        <%= site_name %>
+      </a>
+      
+      <nav id="nav-menu">
+        <a href="#home" class="active"><%= dict.nav_home %></a>
+        <a href="#prices"><%= dict.nav_prices %></a>
+        <a href="#tools"><%= dict.nav_tools %></a>
+        <a href="#simulator"><%= dict.nav_simulator %></a>
+        <a href="/admin?auth=seedorra-admin" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;"><i class="fa-solid fa-lock" style="margin-right: 6px;"></i><%= dict.nav_admin %></a>
+      </nav>
+
+      <div class="lang-selector">
+        <select class="lang-select" onchange="changeLanguage(this.value)">
+          <option value="en" <%= lang === 'en' ? 'selected' : '' %>>🇬🇧 English</option>
+          <option value="yo" <%= lang === 'yo' ? 'selected' : '' %>>🇳🇬 Yoruba</option>
+          <option value="ha" <%= lang === 'ha' ? 'selected' : '' %>>🇳🇬 Hausa</option>
+          <option value="ig" <%= lang === 'ig' ? 'selected' : '' %>>🇳🇬 Igbo</option>
+          <option value="pcm" <%= lang === 'pcm' ? 'selected' : '' %>>🇳🇬 Pidgin</option>
+        </select>
+      </div>
+
+      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <h1 class="hero-title"><span><%= dict.hero_title %></span></h1>
+        <p class="hero-subtitle"><%= dict.hero_subtitle %></p>
+        <div class="hero-actions">
+          <a href="#tools" class="btn btn-primary"><%= dict.btn_get_started %></a>
+          <a href="#prices" class="btn btn-secondary"><%= dict.btn_explore_prices %></a>
+          <a href="#simulator" class="btn btn-accent"><%= dict.btn_try_ussd %></a>
+        </div>
+      </div>
+      <div class="hero-image-wrapper">
+        <!-- Responsive layout styling maps to local media path or uses an aesthetic vector mockup -->
+        <div style="background: linear-gradient(135deg, rgba(86, 178, 89, 0.2), rgba(140, 98, 255, 0.15)); width: 100%; height: 380px; border-radius: var(--border-radius-lg); display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-lg);">
+          <div style="text-align: center; padding: 40px; z-index: 2;">
+            <i class="fa-solid fa-seedling" style="font-size: 72px; color: var(--primary-color); margin-bottom: 20px;"></i>
+            <h3 style="font-size: 24px; margin-bottom: 8px;"><%= site_name %> AI Advisor</h3>
+            <p style="font-size: 14px; color: var(--text-muted); max-width: 280px; margin: 0 auto;">Optimized crop management for smallholder farmers across Nigeria.</p>
+          </div>
+          <div style="position: absolute; bottom: -20px; right: -20px; width: 150px; height: 150px; border-radius: 50%; background-color: rgba(140, 98, 255, 0.1);"></div>
+          <div style="position: absolute; top: -30px; left: -30px; width: 120px; height: 120px; border-radius: 50%; background-color: rgba(86, 178, 89, 0.1);"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weather & Alerts Section -->
+  <section class="section" id="weather">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title"><%= dict.section_weather_title %></h2>
+        <p class="section-desc"><%= dict.section_weather_desc %></p>
+      </div>
+
+      <div class="tools-grid">
+        <!-- Weather Card Selector -->
+        <div class="weather-card">
+          <div class="weather-header-row">
+            <h3 style="font-size: 20px;"><i class="fa-solid fa-cloud-sun" style="color: var(--secondary-color); margin-right: 10px;"></i><%= dict.label_select_region %></h3>
+            <select class="form-control" style="width: auto; padding: 8px 16px;" id="weather-region-select" onchange="updateWeather(this.value)">
+              <option value="SW">South-West (Lagos/Ibadan)</option>
+              <option value="SE">South-East (Enugu/Onitsha)</option>
+              <option value="NW">North-West (Kano/Kaduna)</option>
+              <option value="NE">North-East (Maiduguri/Bauchi)</option>
+              <option value="SS">South-South (Port Harcourt)</option>
+            </select>
+          </div>
+
+          <div class="weather-info">
+            <i class="fa-solid fa-cloud-showers-heavy" id="weather-icon" style="font-size: 48px; color: var(--primary-color);"></i>
+            <div>
+              <div class="weather-temp" id="weather-temp">30°C</div>
+              <div style="font-size: 14px; color: var(--text-muted);" id="weather-forecast">Heavy Thunderstorms expected tomorrow.</div>
+            </div>
+          </div>
+
+          <div class="weather-details">
+            <div class="weather-detail-item">
+              <div class="weather-detail-label"><%= dict.label_temp %></div>
+              <div class="weather-detail-val" id="detail-temp">30°C</div>
+            </div>
+            <div class="weather-detail-item">
+              <div class="weather-detail-label"><%= dict.label_humidity %></div>
+              <div class="weather-detail-val" id="detail-humidity">82%</div>
+            </div>
+            <div class="weather-detail-item" style="grid-column: span 2;">
+              <div class="weather-detail-label"><%= dict.label_wind %></div>
+              <div class="weather-detail-val" id="detail-wind">14 km/h</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Warnings Alert Panel -->
+        <div class="phone-container" style="display: flex; flex-direction: column; justify-content: center;">
+          <div class="alert-box alert-severe" id="weather-alert-card">
+            <div class="alert-header">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span><%= dict.label_active_alert %></span>
+            </div>
+            <div class="alert-message" id="weather-alert-message">
+              Rainfall warning: High flood risk in low-lying farmlands. Clear drainage channels.
+            </div>
+          </div>
+          <div style="margin-top: 24px; padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--border-color); background-color: var(--surface-color); display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-circle-check" style="color: var(--secondary-color); font-size: 24px;"></i>
+            <span style="font-size: 14px; font-weight: 500;"><%= dict.label_status_good %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Market Prices Section -->
+  <section class="section section-alt" id="prices">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title"><%= dict.section_prices_title %></h2>
+        <p class="section-desc"><%= dict.section_prices_desc %></p>
+      </div>
+
+      <div class="prices-wrapper">
+        <table class="price-table">
+          <thead>
+            <tr>
+              <th><%= dict.price_col_commodity %></th>
+              <th><%= dict.price_col_size %></th>
+              <th><%= dict.price_col_current %></th>
+              <th><%= dict.price_col_prev %></th>
+              <th><%= dict.price_col_trend %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% prices.forEach(item => { %>
+              <tr>
+                <td style="font-weight: 600;"><%= item.name %></td>
+                <td><%= item.size %></td>
+                <td style="font-weight: 700;">₦<%= item.current %></td>
+                <td style="color: var(--text-muted);">₦<%= item.previous %></td>
+                <td>
+                  <% if (item.trend === 'up') { %>
+                    <span class="trend-badge trend-up"><i class="fa-solid fa-arrow-trend-up"></i> ▲ ₦<%= item.diff.toLocaleString() %></span>
+                  <% } else if (item.trend === 'down') { %>
+                    <span class="trend-badge trend-down"><i class="fa-solid fa-arrow-trend-down"></i> ▼ ₦<%= Math.abs(item.diff).toLocaleString() %></span>
+                  <% } else { %>
+                    <span class="trend-badge trend-neutral"><i class="fa-solid fa-minus"></i> Stable</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advisory Tools Section -->
+  <section class="section" id="tools">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title"><%= dict.nav_tools %></h2>
+        <p class="section-desc">Generate predictions, estimations, and advisories to increase your yield output.</p>
+      </div>
+
+      <div class="tools-grid">
+        <!-- AI Crop Recommendation -->
+        <div class="tool-card">
+          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-color);"></i>
+            <%= dict.section_crop_title %>
+          </h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_crop_desc %></p>
+          
+          <div class="form-group">
+            <label><%= dict.label_state %></label>
+            <select class="form-control" id="crop-state">
+              <option value="South">Oyo / Osun / Ondo (West)</option>
+              <option value="South">Enugu / Anambra / Imo (East)</option>
+              <option value="North">Kano / Kaduna / Katsina (North)</option>
+              <option value="North">Borno / Adamawa / Bauchi (North-East)</option>
+              <option value="South">Rivers / Delta / Akwa Ibom (South)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><%= dict.label_season %></label>
+            <select class="form-control" id="crop-season">
+              <option value="wet"><%= dict.opt_wet %></option>
+              <option value="dry"><%= dict.opt_dry %></option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" onclick="getRecommendation()"><%= dict.btn_get_rec %></button>
+          
+          <div class="results-box" id="crop-results">
+            <div class="results-title"><%= dict.text_recommended_crops %>:</div>
+            <div class="results-content" id="crop-results-text"></div>
+          </div>
+        </div>
+
+        <!-- Smart Planting Calendar -->
+        <div class="tool-card">
+          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-calendar-check" style="color: var(--primary-color);"></i>
+            <%= dict.section_calendar_title %>
+          </h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_calendar_desc %></p>
+
+          <div class="form-group">
+            <label><%= dict.label_crop %></label>
+            <select class="form-control" id="calendar-crop">
+              <option value="maize">Maize (Masa)</option>
+              <option value="rice">Rice (Shinkafa)</option>
+              <option value="cassava">Cassava (Rogo)</option>
+              <option value="yam">Yam (Doya)</option>
+              <option value="beans">Beans (Wake)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" onclick="getPlantingCalendar()"><%= dict.btn_get_calendar %></button>
+
+          <div class="results-box" id="calendar-results">
+            <div class="results-title"><%= dict.text_planting_window %>:</div>
+            <div class="results-content" id="calendar-results-text"></div>
+          </div>
+        </div>
+
+        <!-- Yield Estimator -->
+        <div class="tool-card">
+          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-calculator" style="color: var(--secondary-color);"></i>
+            <%= dict.section_yield_title %>
+          </h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_yield_desc %></p>
+
+          <div class="form-group">
+            <label><%= dict.label_crop %></label>
+            <select class="form-control" id="yield-crop">
+              <option value="maize">Maize (Corn)</option>
+              <option value="rice">Rice</option>
+              <option value="cassava">Cassava</option>
+              <option value="yam">Yam</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><%= dict.label_farm_size %></label>
+            <input type="number" class="form-control" id="yield-size" value="2" min="0.1" step="0.1">
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" onclick="calculateYield()"><%= dict.btn_calculate_yield %></button>
+
+          <div class="results-box" id="yield-results">
+            <div class="results-title"><%= dict.text_expected_yield %>:</div>
+            <div class="results-content" id="yield-results-text"></div>
+          </div>
+        </div>
+
+        <!-- Soil Health Advisory -->
+        <div class="tool-card">
+          <h3 style="font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-earth-africa" style="color: var(--primary-color);"></i>
+            <%= dict.section_soil_title %>
+          </h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;"><%= dict.section_soil_desc %></p>
+
+          <div class="form-group">
+            <label><%= dict.label_soil_color %></label>
+            <select class="form-control" id="soil-color">
+              <option value="dark"><%= dict.opt_dark %></option>
+              <option value="reddish"><%= dict.opt_reddish %></option>
+              <option value="light"><%= dict.opt_light %></option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><%= dict.label_soil_texture %></label>
+            <select class="form-control" id="soil-texture">
+              <option value="loamy"><%= dict.opt_loamy %></option>
+              <option value="sandy"><%= dict.opt_sandy %></option>
+              <option value="clayey"><%= dict.opt_clayey %></option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><%= dict.label_soil_moisture %></label>
+            <select class="form-control" id="soil-drainage">
+              <option value="moderate"><%= dict.opt_moderate %></option>
+              <option value="fast"><%= dict.opt_fast %></option>
+              <option value="slow"><%= dict.opt_slow %></option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" onclick="getSoilAdvice()"><%= dict.btn_get_soil_advice %></button>
+
+          <div class="results-box" id="soil-results">
+            <div class="results-title"><%= dict.text_soil_advice %>:</div>
+            <div class="results-content" id="soil-results-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SMS & USSD Access Section -->
+  <section class="section section-alt" id="simulator">
+    <div class="container ussd-section-grid">
+      <div class="ussd-info">
+        <h2 class="section-title"><%= dict.section_ussd_title %></h2>
+        <p class="section-desc" style="margin-bottom: 24px;"><%= dict.section_ussd_desc %></p>
+        <p style="font-size: 15px; margin-bottom: 20px;"><%= dict.ussd_dial_inst %></p>
+        <button class="btn btn-accent" onclick="dialUSSD()"><i class="fa-solid fa-phone" style="margin-right: 8px;"></i><%= dict.ussd_btn_dial %></button>
+
+        <!-- SMS Notifications Box -->
+        <div class="phone-sms-box">
+          <h4 style="font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-message" style="color: var(--accent-color);"></i>
+            <%= dict.ussd_sms_title %>
+          </h4>
+          <div class="sms-inbox" id="sms-inbox">
+            <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">No messages received. Use the USSD tool to register.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Phone Simulator Chassis -->
+      <div class="phone-container">
+        <div class="phone-chassis">
+          <div class="phone-screen">
+            <div class="phone-status-bar">
+              <span id="phone-time">21:04</span>
+              <div class="phone-status-right">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+              </div>
+            </div>
+
+            <!-- Screen Display -->
+            <div class="phone-display" id="phone-display">
+              <!-- Dial Dialer Mode -->
+              <div class="phone-dialer" id="phone-dialer">
+                <div class="dialer-input" id="dialer-input"></div>
+                <div class="dialer-grid">
+                  <button class="dial-btn" onclick="pressKey('1')">1</button>
+                  <button class="dial-btn" onclick="pressKey('2')">2</button>
+                  <button class="dial-btn" onclick="pressKey('3')">3</button>
+                  <button class="dial-btn" onclick="pressKey('4')">4</button>
+                  <button class="dial-btn" onclick="pressKey('5')">5</button>
+                  <button class="dial-btn" onclick="pressKey('6')">6</button>
+                  <button class="dial-btn" onclick="pressKey('7')">7</button>
+                  <button class="dial-btn" onclick="pressKey('8')">8</button>
+                  <button class="dial-btn" onclick="pressKey('9')">9</button>
+                  <button class="dial-btn" onclick="pressKey('*')">*</button>
+                  <button class="dial-btn" onclick="pressKey('0')">0</button>
+                  <button class="dial-btn" onclick="pressKey('#')">#</button>
+                  <button class="dial-btn dial-btn-call" onclick="dialUSSD()"><i class="fa-solid fa-phone"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">
+            <div class="logo-icon" style="background: #fff; color: var(--primary-color);">S</div>
+            <%= site_name %>
+          </div>
+          <p style="max-width: 320px; line-height: 1.8;">AI-powered advisory services and live pricing statistics for Nigerian farmers.</p>
+        </div>
+        <div class="footer-link-group">
+          <h4>Features</h4>
+          <ul>
+            <li><a href="#weather">Weather Forecasting</a></li>
+            <li><a href="#prices">Market Pricing</a></li>
+            <li><a href="#tools">AI Crop Matching</a></li>
+            <li><a href="#simulator">USSD/SMS Dialing</a></li>
+          </ul>
+        </div>
+        <div class="footer-link-group">
+          <h4>Support Languages</h4>
+          <ul>
+            <li>English</li>
+            <li>Yoruba (Yorùbá)</li>
+            <li>Hausa (Harshen Hausa)</li>
+            <li>Igbo (Asụsụ Igbo)</li>
+            <li>Pidgin English</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 <%= site_name %> Inc. All rights reserved.</span>
+        <span>Empowering Agriculture with Intelligence.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script logic for calculators and interactive components -->
+  <script>
+    // General language redirect
+    function changeLanguage(val) {
+      window.location.href = `/?lang=${val}`;
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('nav-menu');
+      menu.classList.toggle('mobile-active');
+    }
+
+    // Set phone clock
+    function updateClock() {
+      const clock = document.getElementById('phone-time');
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      hours = hours < 10 ? '0' + hours : hours;
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      clock.textContent = `${hours}:${minutes}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Weather widget logic
+    const weatherData = <%- JSON.stringify(weatherData) %>;
+    function updateWeather(region) {
+      const w = weatherData[region];
+      document.getElementById('weather-temp').textContent = w.temp;
+      document.getElementById('detail-temp').textContent = w.temp;
+      document.getElementById('detail-humidity').textContent = w.humidity;
+      document.getElementById('detail-wind').textContent = w.wind;
+      document.getElementById('weather-forecast').textContent = w.forecast;
+      document.getElementById('weather-alert-message').textContent = w.alert;
+      
+      const alertCard = document.getElementById('weather-alert-card');
+      if (w.severity === 'severe') {
+        alertCard.className = 'alert-box alert-severe';
+      } else {
+        alertCard.className = 'alert-box';
+      }
+      
+      // Update weather icon based on state
+      const icon = document.getElementById('weather-icon');
+      if (region === 'NW' || region === 'NE') {
+        icon.className = 'fa-solid fa-sun';
+        icon.style.color = '#FFC107';
+      } else {
+        icon.className = 'fa-solid fa-cloud-showers-heavy';
+        icon.style.color = 'var(--primary-color)';
+      }
+    }
+    updateWeather('SW'); // Initialize
+
+    // Crop Recommendation Logic
+    function getRecommendation() {
+      const state = document.getElementById('crop-state').value;
+      const season = document.getElementById('crop-season').value;
+      const resultsDiv = document.getElementById('crop-results');
+      const resultsText = document.getElementById('crop-results-text');
+      
+      let crops = "";
+      if (season === 'wet') {
+        crops = "🌱 <strong>Cassava (Gari)</strong>: Best for wet season planting. High soil adaptability.\n" +
+                "🌽 <strong>Maize (White/Yellow)</strong>: Immediate high yield potential. Plant early in wet season.\n" +
+                "🌾 <strong>Rice (Ofada/Local)</strong>: Ideal for swampland and flooded fields.";
+      } else {
+        crops = "🧅 <strong>Onions & Garlic</strong>: High profit margin in dry season. Needs moderate drip irrigation.\n" +
+                "🍅 <strong>Tomatoes</strong>: Excellent dry season yield. Low disease susceptibility in low humidity.\n" +
+                "🥔 <strong>Sweet Potato</strong>: Drought resistant. Requires minimal tilling and holds moisture.";
+      }
+      
+      resultsText.innerHTML = crops.replace(/\n/g, '<br>');
+      resultsDiv.style.display = 'block';
+    }
+
+    // Planting Calendar Logic
+    function getPlantingCalendar() {
+      const crop = document.getElementById('calendar-crop').value;
+      const resultsDiv = document.getElementById('calendar-results');
+      const resultsText = document.getElementById('calendar-results-text');
+      
+      const calendar = {
+        maize: "📅 <strong>Best Sowing Window</strong>: Early April - Mid May (Main Wet Season). 2nd crop can be planted in late August.",
+        rice: "📅 <strong>Best Sowing Window</strong>: May - June (requires steady water logging) or nursery prep in late April.",
+        cassava: "📅 <strong>Best Sowing Window</strong>: April - June (best stem establishment period). Can cultivate year-round with irrigation.",
+        yam: "📅 <strong>Best Sowing Window</strong>: November - February (dry season heap preparation) or early rainy season planting (March).",
+        beans: "📅 <strong>Best Sowing Window</strong>: Late August - September (late rain period prevents pod rotting)."
+      };
+
+      resultsText.innerHTML = calendar[crop];
+      resultsDiv.style.display = 'block';
+    }
+
+    // Yield Estimator
+    function calculateYield() {
+      const crop = document.getElementById('yield-crop').value;
+      const size = parseFloat(document.getElementById('yield-size').value) || 0;
+      const resultsDiv = document.getElementById('yield-results');
+      const resultsText = document.getElementById('yield-results-text');
+      
+      if (size <= 0) {
+        resultsText.textContent = "Please enter a valid farm size.";
+        resultsDiv.style.display = 'block';
+        return;
+      }
+
+      // bags per hectare estimation
+      const yields = {
+        maize: { bags: 45, unit: "bags (50kg)" },
+        rice: { bags: 80, unit: "bags (50kg)" },
+        cassava: { bags: 260, unit: "bags (fresh roots)" },
+        yam: { bags: 400, unit: "tubers (large)" }
+      };
+
+      const rate = yields[crop].bags;
+      const total = Math.round(rate * size);
+      
+      resultsText.innerHTML = `🌾 Your estimated yield for <strong>${size} Hectares</strong> is:<br><span style="font-size: 24px; font-weight: 800; color: var(--primary-color);">${total.toLocaleString()}</span> ${yields[crop].unit}.<br><span style="font-size: 12px; color: var(--text-muted);">*Based on recommended spacing, healthy fertilizer input and moderate rainfall.</span>`;
+      resultsDiv.style.display = 'block';
+    }
+
+    // Soil Advisory
+    function getSoilAdvice() {
+      const color = document.getElementById('soil-color').value;
+      const texture = document.getElementById('soil-texture').value;
+      const drainage = document.getElementById('soil-drainage').value;
+      const resultsDiv = document.getElementById('soil-results');
+      const resultsText = document.getElementById('soil-results-text');
+      
+      let advice = "";
+      if (texture === 'clayey') {
+        advice = "💡 <strong>Clayey Clay Advisory</strong>:<br>" +
+                 "- Soil holds water too long. Apply organic manure or compost to loosen blockages.<br>" +
+                 "- Create raised planting ridges (1-meter wide) to let water drain naturally.<br>" +
+                 "- Cultivate high moisture tolerant crops like Rice, or deep root tubers like Cocoyam.";
+      } else if (texture === 'sandy') {
+        advice = "💡 <strong>Sandy Soil Advisory</strong>:<br>" +
+                 "- High leakage rate, nutrient washoff. Practice deep mulching with dry leaves or grasses.<br>" +
+                 "- Grow ground cover crops (e.g. Groundnuts/Cowpeas) to prevent solar heat evaporation.<br>" +
+                 "- Apply organic compost in small quantities frequently instead of all at once.";
+      } else {
+        advice = "💡 <strong>Loamy Soil Advisory</strong>:<br>" +
+                 "- Perfect soil balance. Keep organic content high by rotating maize with leguminous crops (beans).<br>" +
+                 "- Avoid chemical herbicide overloading. Practice minimal tillage to maintain root structure.";
+      }
+      
+      resultsText.innerHTML = advice;
+      resultsDiv.style.display = 'block';
+    }
+
+    // USSD Simulator State Machine Logic
+    let ussdSessionText = "";
+    let isUssdActive = false;
+
+    function pressKey(key) {
+      const inputDiv = document.getElementById('dialer-input');
+      if (inputDiv.textContent.length < 10) {
+        inputDiv.textContent += key;
+      }
+    }
+
+    function dialUSSD() {
+      const dialerInput = document.getElementById('dialer-input');
+      const code = dialerInput.textContent || "*384*55#";
+      
+      if (code === "*384*55#") {
+        isUssdActive = true;
+        ussdSessionText = "";
+        sendUssdRequest("");
+      } else {
+        alert("Invalid USSD code. Dial *384*55# for Seedorra services.");
+        dialerInput.textContent = "";
+      }
+    }
+
+    function sendUssdRequest(textInput) {
+      const phoneDisplay = document.getElementById('phone-display');
+      
+      fetch('/api/ussd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: textInput,
+          phoneNumber: "08039281234",
+          languageCode: "<%= lang %>"
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Display result on phone screen
+        let screenHtml = `
+          <div class="ussd-alert-card">
+            <div class="ussd-alert-text">${data.response.replace(/\n/g, '<br>')}</div>
+        `;
+        
+        if (!data.isFinal) {
+          screenHtml += `
+            <input type="text" class="ussd-alert-input" id="ussd-input" autofocus placeholder="Type answer...">
+            <div class="ussd-alert-actions">
+              <button class="ussd-alert-btn" onclick="cancelUSSD()">Cancel</button>
+              <button class="ussd-alert-btn" onclick="submitUSSD()">Send</button>
+            </div>
+          `;
+        } else {
+          screenHtml += `
+            <div class="ussd-alert-actions">
+              <button class="ussd-alert-btn" onclick="cancelUSSD()">OK</button>
+            </div>
+          `;
+          
+          // If registration was successful, simulate receiving an SMS after 4 seconds
+          if (data.response.includes("Successful") || data.response.includes("Registration")) {
+            setTimeout(simulateMockSms, 4000);
+          }
+        }
+        
+        screenHtml += `</div>`;
+        phoneDisplay.innerHTML = screenHtml;
+        
+        // Auto-focus input
+        const ussdInput = document.getElementById('ussd-input');
+        if (ussdInput) {
+          ussdInput.focus();
+          // Allow enter key to submit
+          ussdInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+              submitUSSD();
+            }
+          });
+        }
+      });
+    }
+
+    function submitUSSD() {
+      const ussdInput = document.getElementById('ussd-input');
+      if (ussdInput) {
+        const val = ussdInput.value.trim();
+        if (val !== "") {
+          ussdSessionText = ussdSessionText === "" ? val : ussdSessionText + "*" + val;
+          sendUssdRequest(ussdSessionText);
+        }
+      }
+    }
+
+    function cancelUSSD() {
+      isUssdActive = false;
+      ussdSessionText = "";
+      const phoneDisplay = document.getElementById('phone-display');
+      
+      // Restore dialer screen
+      phoneDisplay.innerHTML = `
+        <div class="phone-dialer" id="phone-dialer">
+          <div class="dialer-input" id="dialer-input"></div>
+          <div class="dialer-grid">
+            <button class="dial-btn" onclick="pressKey('1')">1</button>
+            <button class="dial-btn" onclick="pressKey('2')">2</button>
+            <button class="dial-btn" onclick="pressKey('3')">3</button>
+            <button class="dial-btn" onclick="pressKey('4')">4</button>
+            <button class="dial-btn" onclick="pressKey('5')">5</button>
+            <button class="dial-btn" onclick="pressKey('6')">6</button>
+            <button class="dial-btn" onclick="pressKey('7')">7</button>
+            <button class="dial-btn" onclick="pressKey('8')">8</button>
+            <button class="dial-btn" onclick="pressKey('9')">9</button>
+            <button class="dial-btn" onclick="pressKey('*')">*</button>
+            <button class="dial-btn" onclick="pressKey('0')">0</button>
+            <button class="dial-btn" onclick="pressKey('#')">#</button>
+            <button class="dial-btn dial-btn-call" onclick="dialUSSD()"><i class="fa-solid fa-phone"></i></button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Simulate SMS alert reception on phone
+    function simulateMockSms() {
+      const inbox = document.getElementById('sms-inbox');
+      
+      let smsText = "";
+      if ("<%= lang %>" === 'yo') {
+        smsText = "Seedorra: Ikilo Oju-ojo! Ojo nla yoo rọ ni ọla. Daabobo awọn oko rẹ nipa fifọ awọn ikanni sísan omi. Idahun pẹlu *384*55# fun idiyele ọja tuntun.";
+      } else if ("<%= lang %>" === 'ha') {
+        smsText = "Seedorra: Gargaɗin Yanayi! Ana sa ran ruwan sama mai ƙarfi gobe. Ka kiyaye gonarka ta hanyar share magudanun ruwa. Kira *384*55# don duba farashin kasuwa.";
+      } else if ("<%= lang %>" === 'ig') {
+        smsText = "Seedorra: Ịdọ Aka ná Ntị! Oke mmiri ozuzo ga-azo echi. Hichaa ebe mmiri na-esi agbapụta. Kpọọ *384*55# ka ị mara ọnụ ahịa ihe ọkụkụ gị.";
+      } else if ("<%= lang %>" === 'pcm') {
+        smsText = "Seedorra: Weather Alert! Heavy rain go fall tomorrow. Clear drainage for your farm make ground no block water. Dial *384*55# to check market price.";
+      } else {
+        smsText = "Seedorra Alert: Heavy thunderstorm expected tomorrow. Clear all farm drainage to prevent crop flooding. Dial *384*55# for live market pricing.";
+      }
+
+      // Post message to backend sms log
+      fetch('/api/sms/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: "08039281234", message: smsText })
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Display in UI
+        const timeStr = new Date().toLocaleTimeString();
+        const msgHtml = `
+          <div class="sms-message">
+            <div class="sms-sender"><i class="fa-solid fa-bell" style="margin-right: 4px;"></i> Seedorra Info</div>
+            <div class="sms-text">${smsText}</div>
+            <div class="sms-time">${timeStr}</div>
+          </div>
+        `;
+        
+        // Remove empty placeholder
+        if (inbox.textContent.includes("No messages")) {
+          inbox.innerHTML = "";
+        }
+        
+        inbox.innerHTML = msgHtml + inbox.innerHTML;
+      });
+    }
+  </script>
+</body>
+</html>

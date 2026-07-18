@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seedorra Back Access Admin Panel</title>
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .admin-form-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .admin-form-table td {
+      padding: 12px 8px;
+      vertical-align: top;
+    }
+    .admin-form-table td:first-child {
+      width: 250px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body style="background-color: var(--bg-color);">
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="/" class="logo-link">
+        <div class="logo-icon">S</div>
+        <%= site_name %> Admin
+      </a>
+      <nav>
+        <a href="/"><i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Back to Website</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <% if (!isAuthorized) { %>
+      <!-- Simple Password Access Screen -->
+      <div style="max-width: 420px; margin: 100px auto; padding: 40px; background-color: var(--surface-color); border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); text-align: center;">
+        <i class="fa-solid fa-lock" style="font-size: 48px; color: var(--accent-color); margin-bottom: 20px;"></i>
+        <h2 style="font-size: 24px; margin-bottom: 8px;">Seedorra Admin Portal</h2>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Enter password to unlock back access and edit content.</p>
+        
+        <form action="/admin" method="GET">
+          <div class="form-group" style="text-align: left;">
+            <label>Admin Password</label>
+            <input type="password" name="auth" class="form-control" placeholder="Enter admin password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Unlock Back Access</button>
+        </form>
+      </div>
+
+    <% } else { %>
+      <!-- Full Authorized Admin Dashboard -->
+      <div class="admin-grid">
+        <!-- Sidebar Navigation -->
+        <div class="admin-sidebar">
+          <h4 style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; padding: 0 16px;">Sections</h4>
+          <a href="#" class="admin-menu-link active" onclick="switchTab(event, 'general')"><i class="fa-solid fa-gears" style="margin-right: 10px; width: 16px;"></i>General Settings</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-en')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>English Copy</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-yo')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Yoruba Copy</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-ha')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Hausa Copy</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-ig')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Igbo Copy</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'lang-pcm')"><i class="fa-solid fa-language" style="margin-right: 10px; width: 16px;"></i>Pidgin Copy</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'media-tab')"><i class="fa-solid fa-images" style="margin-right: 10px; width: 16px;"></i>Media Files</a>
+          <a href="#" class="admin-menu-link" onclick="switchTab(event, 'campaign-tab')"><i class="fa-solid fa-tower-cell" style="margin-right: 10px; width: 16px;"></i>Registered Users & Logs</a>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="admin-content">
+          <!-- Success Notification Alert -->
+          <div id="success-alert" class="admin-alert admin-alert-success" style="display: none;">
+            <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>
+            <span>Changes saved successfully! Content updated instantly.</span>
+          </div>
+
+          <form id="admin-main-form" action="/admin/save" method="POST">
+            <input type="hidden" name="auth" value="<%= auth %>">
+
+            <!-- Tab 1: General Settings -->
+            <div id="tab-general" class="admin-section active">
+              <h2 style="font-size: 24px; margin-bottom: 8px;">General Settings</h2>
+              <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Manage global site configurations here.</p>
+              
+              <div class="admin-form-group">
+                <label>Website Name</label>
+                <input type="text" name="site_name" class="form-control" value="<%= site_name %>">
+              </div>
+              <div class="admin-form-group">
+                <label>Developer / Sandbox Mode</label>
+                <div style="background-color: var(--bg-color); padding: 16px; border-radius: var(--border-radius-md); font-size: 14px; border: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-circle-info" style="color: var(--primary-color); margin-right: 6px;"></i>
+                  Scraping data is loaded dynamically and cached in memory. Changes to settings persist to <code>content.json</code>.
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabs for Languages Copy -->
+            <% ['en', 'yo', 'ha', 'ig', 'pcm'].forEach(langCode => { %>
+              <div id="tab-lang-<%= langCode %>" class="admin-section">
+                <h2 style="font-size: 24px; margin-bottom: 8px;">
+                  <%= langCode === 'en' ? 'English (🇬🇧)' :
+                      langCode === 'yo' ? 'Yoruba (🇳🇬)' :
+                      langCode === 'ha' ? 'Hausa (🇳🇬)' :
+                      langCode === 'ig' ? 'Igbo (🇳🇬)' : 'Pidgin (🇳🇬)' %> Copy Manager
+                </h2>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Translate and customize every text block for this language.</p>
+
+                <table class="admin-form-table">
+                  <tbody>
+                    <% Object.keys(db.dictionary[langCode]).forEach(key => { %>
+                      <tr>
+                        <td><%= key.replace(/_/g, ' ') %></td>
+                        <td>
+                          <textarea name="dict_<%= langCode %>_<%= key %>" class="form-control"><%= db.dictionary[langCode][key] %></textarea>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% }); %>
+
+            <!-- Save button floating footer for text forms -->
+            <div id="save-footer" style="margin-top: 32px; border-top: 1px solid var(--border-color); padding-top: 24px; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i>Save Changes</button>
+            </div>
+          </form>
+
+          <!-- Tab 7: Media Files (Handled in separate post forms) -->
+          <div id="tab-media-tab" class="admin-section">
+            <h2 style="font-size: 24px; margin-bottom: 8px;">Media Assets Manager</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Upload images from your computer to replace icons and banners on the landing page.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 32px;">
+              <% Object.keys(media).forEach(key => { %>
+                <div style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;">
+                  <div>
+                    <h4 style="text-transform: capitalize; margin-bottom: 8px;"><%= key.replace(/_/g, ' ') %></h4>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Current file path: <code><%= media[key] %></code></p>
+                    <form action="/admin/upload" method="POST" enctype="multipart/form-data">
+                      <input type="hidden" name="auth" value="<%= auth %>">
+                      <input type="hidden" name="media_key" value="<%= key %>">
+                      <div class="form-group">
+                        <input type="file" name="media_file" class="form-control" style="padding: 6px;" required>
+                      </div>
+                      <button type="submit" class="btn btn-secondary" style="padding: 10px 20px;"><i class="fa-solid fa-upload" style="margin-right: 8px;"></i>Upload & Replace</button>
+                    </form>
+                  </div>
+                  <div>
+                    <div style="background-color: var(--bg-color); height: 180px; border-radius: var(--border-radius-sm); border: 1px dashed rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                      <% if (media[key].endsWith('.jpg') || media[key].endsWith('.png') || media[key].endsWith('.jpeg') || media[key].startsWith('/uploads')) { %>
+                        <img src="<%= media[key] %>" alt="<%= key %>" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                      <% } else { %>
+                        <span style="font-size: 13px; color: var(--text-muted);">Media Asset Placeholder</span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+
+          <!-- Tab 8: Campaign / Registered Users Logs -->
+          <div id="tab-campaign-tab" class="admin-section">
+            <h2 style="font-size: 24px; margin-bottom: 8px;">Registered Farmers & SMS Logs</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 32px;">Monitor active USSD registrations and simulated SMS alerts sent out to mobile phones.</p>
+
+            <div class="tools-grid" style="margin-bottom: 40px;">
+              <div style="background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; text-align: center;">
+                <div style="font-size: 40px; font-weight: 800; color: var(--primary-color);"><%= registeredUsersCount %></div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Registered Phone Subscribers</div>
+              </div>
+              <div style="background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; text-align: center;">
+                <div style="font-size: 40px; font-weight: 800; color: var(--accent-color);"><%= smsLog.length %></div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Simulated SMS Sent</div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px;">
+              <!-- User Database -->
+              <div>
+                <h3 style="font-size: 18px; margin-bottom: 16px;">Subscriber Database</h3>
+                <div style="overflow-x: auto; background-color: var(--bg-color); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 12px;">
+                  <% if (registeredUsers.length === 0) { %>
+                    <div style="text-align: center; color: var(--text-muted); font-size: 14px; padding: 30px;">No registered farmers found yet. Use the USSD simulator on home page to register a phone number!</div>
+                  <% } else { %>
+                    <table class="price-table" style="background-color: transparent;">
+                      <thead>
+                        <tr>
+                          <th>Phone</th>
+                          <th>Language</th>
+                          <th>Farm (ha)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% registeredUsers.forEach(user => { %>
+                          <tr>
+                            <td style="font-weight: 600;"><%= user.phone %></td>
+                            <td><span style="background-color: rgba(0,0,0,0.06); padding: 2px 8px; border-radius: 12px; font-size: 12px;"><%= user.lang.toUpperCase() %></span></td>
+                            <td><%= user.size %> ha</td>
+                          </tr>
+                        <% }); %>
+                      </tbody>
+                    </table>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- SMS Feed -->
+              <div>
+                <h3 style="font-size: 18px; margin-bottom: 16px;">SMS Logs Broadcast Feed</h3>
+                <div style="background-color: #1E1E1E; border-radius: var(--border-radius-md); padding: 20px; font-family: monospace; color: #00FF00; height: 350px; overflow-y: auto; font-size: 13px; line-height: 1.5; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);">
+                  <% if (smsLog.length === 0) { %>
+                    <div style="color: #666; text-align: center; padding: 50px 0;">[SYSTEM INBOX EMPTY]<br>Awaiting SMS transmissions...</div>
+                  <% } else { %>
+                    <% smsLog.forEach(log => { %>
+                      <div style="margin-bottom: 16px; border-bottom: 1px solid #333; padding-bottom: 12px;">
+                        <span style="color: #FF00FF;">[<%= log.timestamp %>]</span> <span style="color: #00FFFF;">TO: <%= log.phone %></span><br>
+                        <span style="color: #FFF;"><%= log.message %></span>
+                      </div>
+                    <% }); %>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <script>
+    // Tab switching in Admin Layout
+    function switchTab(e, tabId) {
+      if (e) e.preventDefault();
+      
+      // Update sidebar active link
+      const links = document.querySelectorAll('.admin-menu-link');
+      links.forEach(l => l.classList.remove('active'));
+      if (e) e.currentTarget.classList.add('active');
+
+      // Update workspace tab display
+      const sections = document.querySelectorAll('.admin-section');
+      sections.forEach(s => s.classList.remove('active'));
+      
+      const activeSec = document.getElementById(`tab-${tabId}`);
+      if (activeSec) activeSec.classList.add('active');
+
+      // Hide/Show save button footer based on section type (media/campaign don't need general save)
+      const saveFooter = document.getElementById('save-footer');
+      if (tabId === 'media-tab' || tabId === 'campaign-tab') {
+        saveFooter.style.display = 'none';
+      } else {
+        saveFooter.style.display = 'flex';
+      }
+    }
+
+    // Check query params for success messages
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success')) {
+      const alertDiv = document.getElementById('success-alert');
+      const textSpan = alertDiv.querySelector('span');
+      
+      if (urlParams.get('success') === 'saved') {
+        textSpan.textContent = "Text content updated successfully! Reload home page to see changes.";
+      } else if (urlParams.get('success') === 'media_uploaded') {
+        textSpan.textContent = "Media file replaced successfully! Banner image updated.";
+      }
+      
+      alertDiv.style.display = 'block';
+      
+      // Auto-switch back to correct tab if media was uploaded
+      if (urlParams.get('success') === 'media_uploaded') {
+        // find tab link
+        const mediaLink = document.querySelector('.admin-menu-link[onclick*="media-tab"]');
+        if (mediaLink) mediaLink.click();
+      }
+    }
+  </script>
+</body>
+</html>

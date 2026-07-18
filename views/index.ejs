@@ -164,11 +164,6 @@
             </div>
           </div>
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Access My Dashboard</button>
-        </form>
-        <div style="text-align: center; font-size: 13px;">
-          <span id="gt-admin-toggle-text">Are you a system administrator?</span>
-          <a href="#" style="color: var(--accent-color); font-weight: 700; text-decoration: none;" onclick="toggleGatewayAdminLogin(event)" id="gt-admin-toggle-link">Sign In as Admin</a>
-        </div>
       </div>
 
       <!-- Register Form panel -->
@@ -290,7 +285,7 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; margin-top: 24px;">
+          <div class="fd-feed-grid">
             <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 20px; background-color: var(--bg-color);">
               <h4 style="font-size: 15px; margin-bottom: 12px; color: var(--primary-color);"><i class="fa-solid fa-cloud-sun-rain" style="margin-right: 8px;"></i>Live Climate Threat Alert</h4>
               <div id="fd-weather-desc" style="font-size: 14px; margin-bottom: 12px; font-weight: 600;">Loading status...</div>
@@ -404,7 +399,7 @@
 
         <!-- PANEL 4: USER SETTINGS & BADGES -->
         <div class="fd-panel" id="panel-profile">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+          <div class="fd-profile-grid">
             <!-- Left side: profile edit and password change -->
             <div>
               <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Profile Photo & Settings</h3>
@@ -964,7 +959,6 @@
     }
 
     // --- Gateway Authentication Form Screen controls ---
-    let isGatewayAdminActive = false;
 
     function switchGatewayTab(tab) {
       const btnLogin = document.getElementById('gt-tab-login');
@@ -998,38 +992,6 @@
         pnlLogin.style.display = 'none';
         pnlSuccess.style.display = 'none';
       }
-    }
-
-    function toggleGatewayAdminLogin(e) {
-      if (e) e.preventDefault();
-      isGatewayAdminActive = !isGatewayAdminActive;
-
-      const labelUser = document.getElementById('gt-label-username');
-      const labelCred = document.getElementById('gt-label-credential');
-      const inputUser = document.getElementById('gt-login-username');
-      const inputCred = document.getElementById('gt-login-credential');
-      const link = document.getElementById('gt-admin-toggle-link');
-      const txt = document.getElementById('gt-admin-toggle-text');
-
-      if (isGatewayAdminActive) {
-        labelUser.textContent = "Admin Username";
-        labelCred.textContent = "Password";
-        inputUser.placeholder = "e.g. admin";
-        inputCred.placeholder = "Enter admin password";
-        txt.textContent = "Are you a farmer?";
-        link.textContent = "Sign In as Farmer";
-      } else {
-        labelUser.textContent = "Farmer's Full Name";
-        labelCred.textContent = "Password / Phone Number";
-        inputUser.placeholder = "e.g. Bamidele Alao";
-        inputCred.placeholder = "Enter password or phone number";
-        txt.textContent = "Are you a system administrator?";
-        link.textContent = "Sign In as Admin";
-      }
-
-      inputUser.value = "";
-      inputCred.value = "";
-      document.getElementById('gateway-error').style.display = 'none';
     }
 
     function handleGatewayLogin(e) {

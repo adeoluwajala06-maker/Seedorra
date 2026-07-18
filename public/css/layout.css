@@ -1289,3 +1289,146 @@ footer {
     align-items: flex-start;
   }
 }
+
+/* Responsive Farmer Dashboard Overrides & Spacing Adjustments */
+.farmer-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.farmer-stat-item {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.farmer-stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.fd-feed-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.fd-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+/* Tablet adjustments (max-width: 992px) */
+@media (max-width: 992px) {
+  .farmer-dashboard-card {
+    width: 95%;
+    height: 95%;
+    max-height: 95%;
+  }
+  .fd-feed-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .fd-profile-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Mobile adjustments & Zoom/Scaling Overrides (max-width: 768px) */
+@media (max-width: 768px) {
+  .farmer-dashboard-overlay {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .farmer-dashboard-card {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    /* Zoom/Scaling reduction for mobile screen to fit view perfectly */
+    font-size: 13px;
+  }
+
+  .fd-header {
+    padding: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .fd-header h2 {
+    font-size: 17px;
+    text-align: center;
+  }
+
+  .fd-nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 8px;
+    background-color: rgba(0,0,0,0.04);
+  }
+
+  .fd-nav-tabs::-webkit-scrollbar {
+    display: none; /* Hide scrollbars for clean UI appearance */
+  }
+
+  .fd-tab-item {
+    flex: 0 0 auto;
+  }
+
+  .fd-tab-item button {
+    padding: 8px 14px;
+    font-size: 11.5px;
+    border-radius: 20px;
+  }
+
+  .fd-body {
+    padding: 16px;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .farmer-stat-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .farmer-stat-item {
+    padding: 12px;
+  }
+
+  .fd-feed-grid, .fd-profile-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .farmer-dashboard-footer {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .farmer-dashboard-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

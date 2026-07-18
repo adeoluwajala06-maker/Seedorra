@@ -86,6 +86,19 @@
         "Farm Doctor",
         "Soil Doctor"
       ]
+    },
+    {
+      "name": "Chinedu Obi",
+      "location": "Enugu, Enugu",
+      "size": "3.2",
+      "phone": "08039281234",
+      "email": "",
+      "password": "testpassword",
+      "profile_photo": "/images/onboarding_welcome.jpg",
+      "queries": [],
+      "badges": [
+        "Seedling Saver"
+      ]
     }
   ],
   "dictionary": {
@@ -365,7 +378,17 @@
       "label_farmer_email": "Adireshin Imel (Na Zabi)",
       "label_farmer_size": "Girman Gona (Hekta)",
       "btn_submit_login": "Shiga Allon Sarrafawa",
-      "btn_submit_register": "Ƙirƙiri Akanta"
+      "btn_submit_register": "Ƙirƙiri Akanta",
+      "section_ussd_title": "SMS & USSD Access Simulator",
+      "section_ussd_desc": "Millions of smallholder farmers use basic feature phones. Test how they interact with Seedorra using offline USSD codes and SMS alerts.",
+      "ussd_dial_inst": "Dial the Seedorra USSD code below to launch the offline menu on the simulator screen:",
+      "ussd_btn_dial": "Dial *384*55#",
+      "ussd_sms_title": "SMS Notifications Inbox",
+      "admin_title": "Seedorra Admin Portal",
+      "admin_desc": "Modify website copy, adjust parameters, and upload media files below.",
+      "admin_btn_save": "Save Changes",
+      "admin_media_title": "Media Files Manager",
+      "admin_upload_inst": "Upload a new image from your computer to replace current assets:"
     },
     "ig": {
       "nav_home": "Ụlọ",
@@ -451,7 +474,17 @@
       "label_farmer_email": "Adreesị Ozi-e (Nhọrọ)",
       "label_farmer_size": "Nha Ugbo (Hektas)",
       "btn_submit_login": "Banye Dashboard",
-      "btn_submit_register": "Mepụta Akaụntụ"
+      "btn_submit_register": "Mepụta Akaụntụ",
+      "section_ussd_title": "SMS & USSD Access Simulator",
+      "section_ussd_desc": "Millions of smallholder farmers use basic feature phones. Test how they interact with Seedorra using offline USSD codes and SMS alerts.",
+      "ussd_dial_inst": "Dial the Seedorra USSD code below to launch the offline menu on the simulator screen:",
+      "ussd_btn_dial": "Dial *384*55#",
+      "ussd_sms_title": "SMS Notifications Inbox",
+      "admin_title": "Seedorra Admin Portal",
+      "admin_desc": "Modify website copy, adjust parameters, and upload media files below.",
+      "admin_btn_save": "Save Changes",
+      "admin_media_title": "Media Files Manager",
+      "admin_upload_inst": "Upload a new image from your computer to replace current assets:"
     },
     "pcm": {
       "nav_home": "Home",
@@ -537,7 +570,17 @@
       "label_farmer_email": "Email Address (Optional)",
       "label_farmer_size": "Farm Size (Hectares)",
       "btn_submit_login": "Open Dashboard",
-      "btn_submit_register": "Create Account"
+      "btn_submit_register": "Create Account",
+      "section_ussd_title": "SMS & USSD Access Simulator",
+      "section_ussd_desc": "Millions of smallholder farmers use basic feature phones. Test how they interact with Seedorra using offline USSD codes and SMS alerts.",
+      "ussd_dial_inst": "Dial the Seedorra USSD code below to launch the offline menu on the simulator screen:",
+      "ussd_btn_dial": "Dial *384*55#",
+      "ussd_sms_title": "SMS Notifications Inbox",
+      "admin_title": "Seedorra Admin Portal",
+      "admin_desc": "Modify website copy, adjust parameters, and upload media files below.",
+      "admin_btn_save": "Save Changes",
+      "admin_media_title": "Media Files Manager",
+      "admin_upload_inst": "Upload a new image from your computer to replace current assets:"
     }
   },
   "seen_onboarding_ips": [
@@ -547,7 +590,7 @@
     "primary_color": "#1a5718",
     "primary_hover": "#113a10",
     "secondary_color": "#56b259",
-    "accent_color": "#791a3e",
+    "accent_color": "#dce00b",
     "bg_color": "#f8f9fa",
     "surface_color": "#ffffff",
     "text_main": "#1a1a1a",

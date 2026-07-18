@@ -164,6 +164,7 @@
             </div>
           </div>
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Access My Dashboard</button>
+        </form>
       </div>
 
       <!-- Register Form panel -->
@@ -568,14 +569,21 @@
           </span>
         </nav>
 
-        <div class="lang-selector">
-          <select class="lang-select" onchange="changeLanguage(this.value)">
-            <option value="en" <%= lang === 'en' ? 'selected' : '' %>>🇬🇧 English</option>
-            <option value="yo" <%= lang === 'yo' ? 'selected' : '' %>>🇳🇬 Yoruba</option>
-            <option value="ha" <%= lang === 'ha' ? 'selected' : '' %>>🇳🇬 Hausa</option>
-            <option value="ig" <%= lang === 'ig' ? 'selected' : '' %>>🇳🇬 Igbo</option>
-            <option value="pcm" <%= lang === 'pcm' ? 'selected' : '' %>>🇳🇬 Pidgin</option>
-          </select>
+        <div class="nav-actions">
+          <!-- Theme switch toggle button -->
+          <button id="theme-toggle-btn" class="theme-toggle-btn" onclick="toggleTheme()" title="Switch Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          <div class="lang-selector" style="margin: 0;">
+            <select class="lang-select" onchange="changeLanguage(this.value)">
+              <option value="en" <%= lang === 'en' ? 'selected' : '' %>>🇬🇧 English</option>
+              <option value="yo" <%= lang === 'yo' ? 'selected' : '' %>>🇳🇬 Yoruba</option>
+              <option value="ha" <%= lang === 'ha' ? 'selected' : '' %>>🇳🇬 Hausa</option>
+              <option value="ig" <%= lang === 'ig' ? 'selected' : '' %>>🇳🇬 Igbo</option>
+              <option value="pcm" <%= lang === 'pcm' ? 'selected' : '' %>>🇳🇬 Pidgin</option>
+            </select>
+          </div>
         </div>
 
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
@@ -1620,6 +1628,31 @@
         }
       }
     });
+
+    // Theme Switcher Functions
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      
+      const btnIcon = document.querySelector('#theme-toggle-btn i');
+      if (btnIcon) {
+        if (isDark) {
+          btnIcon.className = "fa-solid fa-sun";
+        } else {
+          btnIcon.className = "fa-solid fa-moon";
+        }
+      }
+    }
+
+    // Apply saved theme immediately on load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-theme');
+      window.addEventListener('DOMContentLoaded', () => {
+        const btnIcon = document.querySelector('#theme-toggle-btn i');
+        if (btnIcon) btnIcon.className = "fa-solid fa-sun";
+      });
+    }
   </script>
 </body>
 </html>
